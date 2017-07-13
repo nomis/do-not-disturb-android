@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+/*
 	do-not-disturb-android - Android Do not Disturb Service
 
 	Copyright 2017  Simon Arlott
@@ -16,14 +15,18 @@
 
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
--->
-<resources>
-	<string name="app_name">DnD Rules</string>
-	<string name="menu_access">Notification Access</string>
+ */
+package uk.me.sa.android.do_not_disturb.ui;
 
-	<string name="notification_enable">Enable</string>
-	<string name="notification_disable">Disable</string>
-	<string name="notification_edit">Edit</string>
+import org.androidannotations.annotations.EViewGroup;
 
-	<string name="new_rule">Add rule</string>
-</resources>
+import uk.me.sa.android.do_not_disturb.R;
+import android.content.Context;
+import android.widget.LinearLayout;
+
+@EViewGroup(R.layout.add_rule)
+public class AddRuleLine extends LinearLayout {
+	public AddRuleLine(Context context) {
+		super(context);
+	}
+}

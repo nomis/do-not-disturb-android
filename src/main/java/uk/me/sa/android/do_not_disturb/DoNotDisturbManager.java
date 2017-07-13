@@ -62,8 +62,8 @@ public class DoNotDisturbManager implements Runnable {
 		log.info("Interruption filter changed from " + currentInterruptionFilter + " to " + newInterruptionFilter);
 		currentInterruptionFilter = newInterruptionFilter;
 
-		if (currentInterruptionFilter == desiredInterruptionFilter
-				|| /* OnePlus 5 is broken... */(currentInterruptionFilter == InterruptionFilter.SILENT && desiredInterruptionFilter == InterruptionFilter.ALARMS)) {
+		if (currentInterruptionFilter == desiredInterruptionFilter || /* OnePlus 5 is broken... */(currentInterruptionFilter == InterruptionFilter.SILENT
+				&& desiredInterruptionFilter == InterruptionFilter.ALARMS)) {
 			log.info("Successfully set interruption filter");
 			success = true;
 		} else if (desiredInterruptionFilter != InterruptionFilter.UNKNOWN) {

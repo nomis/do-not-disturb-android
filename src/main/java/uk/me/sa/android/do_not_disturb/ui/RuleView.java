@@ -18,36 +18,34 @@
  */
 package uk.me.sa.android.do_not_disturb.ui;
 
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Bean;
-import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.OptionsItem;
-import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.ViewById;
 
 import uk.me.sa.android.do_not_disturb.R;
-import android.app.Activity;
-import android.content.Intent;
-import android.provider.Settings;
-import android.widget.ListView;
+import uk.me.sa.android.do_not_disturb.data.Rule;
+import android.content.Context;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
-@EActivity(R.layout.activity_main)
-@OptionsMenu(R.menu.main_activity_actions)
-public class MainActivity extends Activity {
+@EViewGroup(R.layout.list_rule)
+public class RuleView extends LinearLayout {
 	@ViewById
-	ListView rules;
+	TextView name;
 
-	@Bean
-	RuleListAdapter adapter;
+	@ViewById
+	TextView description;
 
-	@AfterViews
-	void bindAdapter() {
-		rules.setAdapter(adapter);
+	// @ViewById
+	// ToggleButton enabled;
+
+	public RuleView(Context context) {
+		super(context);
 	}
 
-	@OptionsItem(R.id.menu_access)
-	void openNotificationAccess() {
-		startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+	public void bind(Rule rule) {
+		name.setText(rule.name);
+		description.setText(String.format("Days / %02d:%02d to %02d:%02d / %s", rule.startHour, rule.startMinute, rule.endHour, rule.endMinute,
+				rule.level.toString()));
+		// enabled.setChecked(rule.isEnabled());
 	}
-
 }
