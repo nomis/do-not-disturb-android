@@ -28,6 +28,6 @@
 		android:id="@+id/rules"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:background="?android:attr/listDivider">
+		android:divider="?android:attr/listDivider">
 	</ListView>
 </LinearLayout>
