@@ -25,5 +25,9 @@
 	<string name="notification_disable">Disable</string>
 	<string name="notification_edit">Edit</string>
 
-	<string name="new_rule">Add rule</string>
+	<string name="add_rule">Add rule</string>
+	<string name="enter_rule_name">Enter rule name</string>
+
+	<string name="on">On</string>
+	<string name="off">Off</string>
 </resources>

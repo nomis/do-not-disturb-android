@@ -21,15 +21,19 @@ package uk.me.sa.android.do_not_disturb.ui;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import uk.me.sa.android.do_not_disturb.R;
+import uk.me.sa.android.do_not_disturb.data.Rule;
+import uk.me.sa.android.do_not_disturb.ui.DialogUtil.InputTextListener;
 import android.app.Activity;
 import android.content.Intent;
 import android.provider.Settings;
 import android.widget.ListView;
+import android.widget.Toast;
 
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.main_activity_actions)
@@ -45,9 +49,33 @@ public class MainActivity extends Activity {
 		rules.setAdapter(adapter);
 	}
 
+	@ItemClick(R.id.rules)
+	void ruleClicked(Rule rule) {
+		if (rule == null) {
+			addRule();
+		} else {
+			editRule(rule);
+		}
+	}
+
+	void editRule(Rule rule) {
+		Toast.makeText(this, rule.toString(), Toast.LENGTH_SHORT).show();
+	}
+
+	void addRule() {
+		DialogUtil.inputText(this, R.string.add_rule, null, R.string.enter_rule_name, new InputTextListener() {
+			@Override
+			public void onInputText(String value) {
+				Rule rule = new Rule(0);
+				rule.name = value;
+				adapter.rules.add(rule);
+				adapter.notifyDataSetChanged();
+			}
+		});
+	}
+
 	@OptionsItem(R.id.menu_access)
 	void openNotificationAccess() {
 		startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 	}
-
 }

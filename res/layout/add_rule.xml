@@ -22,11 +22,11 @@
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 	android:orientation="horizontal"
-	android:paddingBottom="10dp"
-	android:paddingTop="10dp"
-	android:paddingLeft="10dp"
-	android:paddingRight="10dp"
-	tools:context=".ui.RuleView">
+	android:paddingTop="@dimen/outerPadding"
+	android:paddingBottom="@dimen/outerPadding"
+	android:paddingLeft="@dimen/outerPadding"
+	android:paddingRight="@dimen/outerPadding"
+	tools:context=".ui.AddRuleLine">
 
 	<ImageView
 		android:id="@+id/add_icon"
@@ -37,13 +37,15 @@
 	</ImageView>
 
 	<TextView
-		android:id="@+id/new_rule"
+		android:id="@+id/add_rule"
 		android:layout_width="fill_parent"
 		android:layout_height="match_parent"
-		android:layout_marginStart="10dp"
+		android:layout_marginStart="@dimen/innerPadding"
 		android:gravity="center_vertical"
 		android:textSize="18sp"
 		android:textStyle="bold"
-		android:text="@string/new_rule">
+		android:text="@string/add_rule"
+		android:ellipsize="marquee"
+		android:singleLine="true">
 	</TextView>
 </LinearLayout>

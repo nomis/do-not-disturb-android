@@ -22,10 +22,10 @@
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 	android:orientation="horizontal"
-	android:paddingBottom="10dp"
-	android:paddingTop="10dp"
-	android:paddingLeft="10dp"
-	android:paddingRight="10dp"
+	android:paddingTop="@dimen/outerPadding"
+	android:paddingBottom="@dimen/outerPadding"
+	android:paddingLeft="@dimen/outerPadding"
+	android:paddingRight="@dimen/outerPadding"
 	tools:context=".ui.RuleView">
 
 	<ImageView
@@ -39,8 +39,7 @@
 	<LinearLayout
 		android:layout_width="fill_parent"
 		android:layout_height="match_parent"
-		android:layout_marginStart="10dp"
-		android:layout_marginEnd="10dp"
+		android:layout_marginStart="@dimen/innerPadding"
 		android:gravity="center_vertical"
 		android:orientation="vertical">
 
@@ -49,21 +48,18 @@
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:textSize="18sp"
-			android:textStyle="bold">
+			android:textStyle="bold"
+			android:singleLine="true"
+			android:ellipsize="end">
 		</TextView>
 
 		<TextView
 			android:id="@+id/description"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:textSize="14sp">
+			android:textSize="14sp"
+			android:singleLine="true"
+			android:ellipsize="marquee">
 		</TextView>
 	</LinearLayout>
-
-<!--
-	<ToggleButton android:id="@+id/enabled"
-		android:layout_width="wrap_content"
-		android:layout_height="match_parent">
-	</ToggleButton>
--->
 </LinearLayout>

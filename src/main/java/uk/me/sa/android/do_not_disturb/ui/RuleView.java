@@ -35,17 +35,14 @@ public class RuleView extends LinearLayout {
 	@ViewById
 	TextView description;
 
-	// @ViewById
-	// ToggleButton enabled;
-
 	public RuleView(Context context) {
 		super(context);
 	}
 
 	public void bind(Rule rule) {
+		// TODO adjust opacity and icon when disabled
 		name.setText(rule.name);
 		description.setText(String.format("Days / %02d:%02d to %02d:%02d / %s", rule.startHour, rule.startMinute, rule.endHour, rule.endMinute,
 				rule.level.toString()));
-		// enabled.setChecked(rule.isEnabled());
 	}
 }
