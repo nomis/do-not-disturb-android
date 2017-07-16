@@ -19,6 +19,7 @@
 package uk.me.sa.android.do_not_disturb.ui;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ItemClick;
@@ -28,6 +29,7 @@ import org.androidannotations.annotations.ViewById;
 
 import uk.me.sa.android.do_not_disturb.R;
 import uk.me.sa.android.do_not_disturb.data.Rule;
+import uk.me.sa.android.do_not_disturb.data.RulesDAO;
 import uk.me.sa.android.do_not_disturb.ui.DialogUtil.InputTextListener;
 import android.app.Activity;
 import android.content.Intent;
@@ -44,6 +46,9 @@ public class MainActivity extends Activity {
 	@Bean
 	RuleListAdapter adapter;
 
+	@Bean
+	RulesDAO db;
+
 	@AfterViews
 	void bindAdapter() {
 		rules.setAdapter(adapter);
@@ -59,19 +64,32 @@ public class MainActivity extends Activity {
 	}
 
 	void editRule(Rule rule) {
-		Toast.makeText(this, rule.toString(), Toast.LENGTH_SHORT).show();
+		Intent intent = new Intent(EditRuleActivity.ACTION_EDIT, null, this, EditRuleActivity_.class);
+		intent.putExtra(EditRuleActivity.EXTRA_RULE_ID, rule.getId());
+		startActivity(intent);
 	}
 
 	void addRule() {
 		DialogUtil.inputText(this, R.string.add_rule, null, R.string.enter_rule_name, new InputTextListener() {
 			@Override
 			public void onInputText(String value) {
-				Rule rule = new Rule(0);
-				rule.name = value;
-				adapter.rules.add(rule);
-				adapter.notifyDataSetChanged();
+				addRule(value);
 			}
 		});
+	}
+
+	@Background
+	void addRule(String name) {
+		Rule rule = new Rule();
+
+		rule.setName(name);
+		if (db.addRule(rule)) {
+			adapter.loadRules(); // TODO use broadcast
+
+			editRule(rule);
+		} else {
+			Toast.makeText(this, R.string.error_adding_rule, Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	@OptionsItem(R.id.menu_access)

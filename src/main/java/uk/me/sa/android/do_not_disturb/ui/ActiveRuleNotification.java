@@ -47,42 +47,43 @@ public final class ActiveRuleNotification {
 	private Context context;
 	private NotificationManager notificationManager;
 	@SuppressLint("UseSparseArrays")
-	private Map<Integer, Rule> rules = new HashMap<Integer, Rule>();
+	private Map<Long, Rule> rules = new HashMap<Long, Rule>();
 
 	public ActiveRuleNotification(Context context) {
 		this.context = context;
 		notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager.cancelAll();
 	}
 
 	public synchronized void setActiveRules(Set<Rule> newRules) {
-		Set<Integer> newRuleIds = new HashSet<Integer>();
+		Set<Long> newRuleIds = new HashSet<Long>();
 
 		for (Rule newRule : newRules) {
-			newRuleIds.add(newRule.id);
+			newRuleIds.add(newRule.getId());
 
-			if (Objects.equal(rules.get(newRule.id), newRule)) {
+			if (Objects.equal(rules.get(newRule.getId()), newRule)) {
 				continue;
 			}
 
 			log.info("Adding notification for {}", newRule);
-			NotificationCompat.Builder builder = new NotificationCompat.Builder(context).setContentTitle(newRule.name).setContentText(newRule.level.toString())
-					.setOngoing(true).setPriority(Notification.PRIORITY_HIGH);
+			NotificationCompat.Builder builder = new NotificationCompat.Builder(context).setContentTitle(newRule.getName())
+					.setContentText(newRule.getLevel().toString()).setOngoing(true).setPriority(Notification.PRIORITY_HIGH);
 
-			Intent editIntent = new Intent(NotificationListener.ACTION_EDIT, null, context, NotificationListener_.class);
-			editIntent.putExtra(NotificationListener.EXTRA_RULE_ID, newRule.id);
+			Intent editIntent = new Intent(EditRuleActivity.ACTION_EDIT, null, context, EditRuleActivity_.class);
+			editIntent.putExtra(EditRuleActivity.EXTRA_RULE_ID, newRule.getId());
 			builder.addAction(android.R.drawable.ic_menu_edit, context.getString(R.string.notification_edit),
 					PendingIntent.getService(context, 0, editIntent, 0));
 
 			if (newRule.isTemporarilyDisabled()) {
-				Intent enableIntent = new Intent(NotificationListener.ACTION_ENABLE, null, context, NotificationListener_.class);
-				enableIntent.putExtra(NotificationListener.EXTRA_RULE_ID, newRule.id);
+				Intent enableIntent = new Intent(NotificationListener.ACTION_TEMPORARY_ENABLE, null, context, NotificationListener_.class);
+				enableIntent.putExtra(EditRuleActivity.EXTRA_RULE_ID, newRule.getId());
 
 				builder.setSmallIcon(R.drawable.ic_do_not_disturb_off);
 				builder.addAction(android.R.drawable.button_onoff_indicator_off, context.getString(R.string.notification_enable),
 						PendingIntent.getService(context, 0, enableIntent, 0));
 			} else {
-				Intent disableIntent = new Intent(NotificationListener.ACTION_DISABLE, null, context, NotificationListener_.class);
-				disableIntent.putExtra(NotificationListener.EXTRA_RULE_ID, newRule.id);
+				Intent disableIntent = new Intent(NotificationListener.ACTION_TEMPORARY_DISABLE, null, context, NotificationListener_.class);
+				disableIntent.putExtra(EditRuleActivity.EXTRA_RULE_ID, newRule.getId());
 
 				builder.setSmallIcon(R.drawable.ic_do_not_disturb_on);
 				builder.addAction(android.R.drawable.button_onoff_indicator_on, context.getString(R.string.notification_disable),
@@ -91,17 +92,17 @@ public final class ActiveRuleNotification {
 
 			Notification notification = builder.build();
 			notification.visibility = Notification.VISIBILITY_PUBLIC;
-			notificationManager.notify(newRule.id, notification);
+			notificationManager.notify((int)newRule.getId(), notification);
 
-			rules.put(newRule.id, new Rule(newRule));
+			rules.put(newRule.getId(), newRule.clone());
 		}
 
-		for (Iterator<Integer> it = rules.keySet().iterator(); it.hasNext();) {
-			Integer id = it.next();
+		for (Iterator<Long> it = rules.keySet().iterator(); it.hasNext();) {
+			Long id = it.next();
 
 			if (!newRuleIds.contains(id)) {
 				log.info("Removing notification for {}", rules.get(id));
-				notificationManager.cancel(id);
+				notificationManager.cancel(id.intValue());
 
 				it.remove();
 			}

@@ -17,60 +17,195 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
-	android:fillViewport="true"
+	android:orientation="vertical"
 	tools:context=".ui.RuleEdit">
 
-	<LinearLayout
+	<Switch
+		android:id="@+id/enabled"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:orientation="vertical"
-		android:paddingTop="@dimen/outerPadding"
-		android:paddingBottom="@dimen/outerPadding"
+		android:minHeight="?android:attr/actionBarSize"
 		android:paddingLeft="@dimen/outerPadding"
 		android:paddingRight="@dimen/outerPadding"
-		android:divider="?android:attr/listDivider"
-		android:showDividers="middle|end">
+		android:gravity="center_vertical"
+		android:background="?android:attr/colorSecondary"
+		android:textColor="?android:attr/textColorPrimaryInverse"
+		android:textSize="@dimen/keyTextSize"
+		android:textStyle="bold"
+		android:textOn="@string/on"
+		android:textOff="@string/off">
+	</Switch>
 
-		<Switch
-			android:id="@+id/enabled"
+	<ScrollView
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:fillViewport="true">
+
+		<LinearLayout
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:textOn="@string/on"
-			android:textOff="@string/off">
-		</Switch>
+			android:orientation="vertical"
+			android:divider="?android:attr/listDivider"
+			android:showDividers="middle|end">
 
-		<TextView
-			android:id="@+id/name"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content">
-		</TextView>
-
-		<TextView
-			android:id="@+id/days"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content">
-		</TextView>
-
-		<TextView
-			android:id="@+id/start"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content">
-		</TextView>
-
-		<TextView
-			android:id="@+id/end"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content">
-		</TextView>
-
-		<TextView
-			android:id="@+id/level"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content">
-		</TextView>
-	</LinearLayout>
-</ScrollView>
+			<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:paddingTop="@dimen/outerPadding"
+				android:paddingBottom="@dimen/outerPadding"
+				android:paddingLeft="@dimen/outerPadding"
+				android:paddingRight="@dimen/outerPadding"
+				android:orientation="vertical">
+	
+				<TextView
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:textColor="?android:attr/textColorPrimary"
+					android:textSize="@dimen/keyTextSize"
+					android:textStyle="bold"
+					android:text="@string/rule_name"
+					android:singleLine="true"
+					android:ellipsize="end">
+				</TextView>
+	
+				<TextView
+					android:id="@+id/name"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:textColor="?android:attr/textColorPrimary"
+					android:textSize="@dimen/valueTextSize"
+					android:singleLine="true"
+					android:ellipsize="marquee">
+				</TextView>
+			</LinearLayout>
+	
+			<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:paddingTop="@dimen/outerPadding"
+				android:paddingBottom="@dimen/outerPadding"
+				android:paddingLeft="@dimen/outerPadding"
+				android:paddingRight="@dimen/outerPadding"
+				android:orientation="vertical">
+	
+				<TextView
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:textColor="?android:attr/textColorPrimary"
+					android:textSize="@dimen/keyTextSize"
+					android:textStyle="bold"
+					android:text="@string/days"
+					android:singleLine="true"
+					android:ellipsize="end">
+				</TextView>
+	
+				<TextView
+					android:id="@+id/days"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:textColor="?android:attr/textColorPrimary"
+					android:textSize="@dimen/valueTextSize"
+					android:singleLine="true"
+					android:ellipsize="marquee">
+				</TextView>
+			</LinearLayout>
+	
+			<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:paddingTop="@dimen/outerPadding"
+				android:paddingBottom="@dimen/outerPadding"
+				android:paddingLeft="@dimen/outerPadding"
+				android:paddingRight="@dimen/outerPadding"
+				android:orientation="vertical">
+	
+				<TextView
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:textColor="?android:attr/textColorPrimary"
+					android:textSize="@dimen/keyTextSize"
+					android:textStyle="bold"
+					android:text="@string/start_time"
+					android:singleLine="true"
+					android:ellipsize="end">
+				</TextView>
+	
+				<TextView
+					android:id="@+id/start"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:textColor="?android:attr/textColorPrimary"
+					android:textSize="@dimen/valueTextSize"
+					android:singleLine="true"
+					android:ellipsize="marquee">
+				</TextView>
+			</LinearLayout>
+	
+			<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:paddingTop="@dimen/outerPadding"
+				android:paddingBottom="@dimen/outerPadding"
+				android:paddingLeft="@dimen/outerPadding"
+				android:paddingRight="@dimen/outerPadding"
+				android:orientation="vertical">
+	
+				<TextView
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:textColor="?android:attr/textColorPrimary"
+					android:textSize="@dimen/keyTextSize"
+					android:textStyle="bold"
+					android:text="@string/end_time"
+					android:singleLine="true"
+					android:ellipsize="end">
+				</TextView>
+		
+				<TextView
+					android:id="@+id/end"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:textColor="?android:attr/textColorPrimary"
+					android:textSize="@dimen/valueTextSize"
+					android:singleLine="true"
+					android:ellipsize="marquee">
+				</TextView>
+			</LinearLayout>
+	
+			<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:paddingTop="@dimen/outerPadding"
+				android:paddingBottom="@dimen/outerPadding"
+				android:paddingLeft="@dimen/outerPadding"
+				android:paddingRight="@dimen/outerPadding"
+				android:orientation="vertical">
+	
+				<TextView
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:textColor="?android:attr/textColorPrimary"
+					android:textSize="@dimen/keyTextSize"
+					android:textStyle="bold"
+					android:text="@string/level"
+					android:singleLine="true"
+					android:ellipsize="end">
+				</TextView>
+	
+				<TextView
+					android:id="@+id/level"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:textColor="?android:attr/textColorPrimary"
+					android:textSize="@dimen/valueTextSize"
+					android:singleLine="true"
+					android:ellipsize="marquee">
+				</TextView>
+			</LinearLayout>
+		</LinearLayout>
+	</ScrollView>
+</LinearLayout>

@@ -59,11 +59,11 @@ public class DoNotDisturbManager implements Runnable {
 	}
 
 	public synchronized void updateInterruptionFilter(InterruptionFilter newInterruptionFilter) {
-		log.info("Interruption filter changed from " + currentInterruptionFilter + " to " + newInterruptionFilter);
+		log.info("Interruption filter changed from {} to {}", currentInterruptionFilter, newInterruptionFilter);
 		currentInterruptionFilter = newInterruptionFilter;
 
-		if (currentInterruptionFilter == desiredInterruptionFilter || /* OnePlus 5 is broken... */(currentInterruptionFilter == InterruptionFilter.SILENT
-				&& desiredInterruptionFilter == InterruptionFilter.ALARMS)) {
+		if (currentInterruptionFilter == desiredInterruptionFilter
+				|| /* OnePlus 5 is broken... */(currentInterruptionFilter == InterruptionFilter.SILENT && desiredInterruptionFilter == InterruptionFilter.ALARMS)) {
 			log.info("Successfully set interruption filter");
 			success = true;
 		} else if (desiredInterruptionFilter != InterruptionFilter.UNKNOWN) {
@@ -103,8 +103,8 @@ public class DoNotDisturbManager implements Runnable {
 				log.info("Rule {} is inactive", rule);
 			} else {
 				log.info("Rule {} is active", rule);
-				if (desiredInterruptionFilter.compareTo(rule.level) > 0) {
-					desiredInterruptionFilter = rule.level;
+				if (desiredInterruptionFilter.compareTo(rule.getLevel()) > 0) {
+					desiredInterruptionFilter = rule.getLevel();
 				}
 			}
 		}

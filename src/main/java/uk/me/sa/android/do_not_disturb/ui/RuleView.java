@@ -18,6 +18,7 @@
  */
 package uk.me.sa.android.do_not_disturb.ui;
 
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.ViewById;
 
@@ -29,6 +30,9 @@ import android.widget.TextView;
 
 @EViewGroup(R.layout.list_rule)
 public class RuleView extends LinearLayout {
+	@Bean
+	RuleText ruleText;
+
 	@ViewById
 	TextView name;
 
@@ -41,8 +45,7 @@ public class RuleView extends LinearLayout {
 
 	public void bind(Rule rule) {
 		// TODO adjust opacity and icon when disabled
-		name.setText(rule.name);
-		description.setText(String.format("Days / %02d:%02d to %02d:%02d / %s", rule.startHour, rule.startMinute, rule.endHour, rule.endMinute,
-				rule.level.toString()));
+		name.setText(rule.getName());
+		description.setText(ruleText.getDescription(rule));
 	}
 }

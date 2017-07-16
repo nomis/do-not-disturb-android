@@ -42,6 +42,7 @@
 		android:layout_height="match_parent"
 		android:layout_marginStart="@dimen/innerPadding"
 		android:gravity="center_vertical"
+		android:textColor="?android:attr/textColorPrimary"
 		android:textSize="18sp"
 		android:textStyle="bold"
 		android:text="@string/add_rule"

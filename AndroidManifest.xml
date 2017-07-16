@@ -41,7 +41,6 @@
 				<action android:name="android.service.notification.NotificationListenerService"/>
 				<action android:name="uk.me.sa.android.do_not_disturb.NotificationListener.ENABLE"/>
 				<action android:name="uk.me.sa.android.do_not_disturb.NotificationListener.DISABLE"/>
-				<action android:name="uk.me.sa.android.do_not_disturb.NotificationListener.EDIT"/>
 			</intent-filter>
 		</service>
 		
@@ -52,6 +51,13 @@
 				<action android:name="android.intent.action.MAIN"/>
 
 				<category android:name="android.intent.category.LAUNCHER"/>
+			</intent-filter>
+		</activity>
+
+		<activity
+			android:name=".ui.EditRuleActivity_">
+			<intent-filter>
+				<action android:name="uk.me.sa.android.do_not_disturb.ui.EditRuleActivity.EDIT"/>
 			</intent-filter>
 		</activity>
 	</application>

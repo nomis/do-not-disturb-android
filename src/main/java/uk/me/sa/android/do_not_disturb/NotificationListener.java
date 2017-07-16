@@ -25,19 +25,18 @@ import org.androidannotations.annotations.EService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.me.sa.android.do_not_disturb.data.InterruptionFilter;
+import uk.me.sa.android.do_not_disturb.data.Rule;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.service.notification.NotificationListenerService;
-import uk.me.sa.android.do_not_disturb.data.InterruptionFilter;
-import uk.me.sa.android.do_not_disturb.data.Rule;
 
 @EService
 public class NotificationListener extends NotificationListenerService {
 	private static final Logger log = LoggerFactory.getLogger(NotificationListener.class);
 
-	public static final String ACTION_ENABLE = NotificationListener.class.getName() + ".ENABLE";
-	public static final String ACTION_DISABLE = NotificationListener.class.getName() + ".DISABLE";
-	public static final String ACTION_EDIT = NotificationListener.class.getName() + ".EDIT";
+	public static final String ACTION_TEMPORARY_ENABLE = NotificationListener.class.getName() + ".ENABLE";
+	public static final String ACTION_TEMPORARY_DISABLE = NotificationListener.class.getName() + ".DISABLE";
 	public static final String EXTRA_RULE_ID = NotificationListener.class.getName() + ".RULE_ID";
 
 	DoNotDisturbManager dndManager;
@@ -61,11 +60,11 @@ public class NotificationListener extends NotificationListenerService {
 			return START_STICKY;
 		}
 
-		if (intent.getAction().equals(ACTION_ENABLE) || intent.getAction().equals(ACTION_DISABLE)) {
+		if (intent.getAction().equals(ACTION_TEMPORARY_ENABLE) || intent.getAction().equals(ACTION_TEMPORARY_DISABLE)) {
 			int id = intent.getExtras().getInt(EXTRA_RULE_ID);
 
 			if (rules.containsKey(id)) {
-				rules.get(id).setTemporarilyDisabled(intent.getAction().equals(ACTION_DISABLE));
+				rules.get(id).setTemporarilyDisabled(intent.getAction().equals(ACTION_TEMPORARY_DISABLE));
 				dndManager.setRules(rules.values());
 			}
 		}

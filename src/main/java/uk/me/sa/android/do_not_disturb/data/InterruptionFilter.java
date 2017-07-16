@@ -18,16 +18,26 @@
  */
 package uk.me.sa.android.do_not_disturb.data;
 
+import uk.me.sa.android.do_not_disturb.R;
+
 public enum InterruptionFilter {
-	SILENT ("Total silence"), ALARMS ("Alarms only"), PRIORITY ("Priority only"), NORMAL (null), UNKNOWN (null);
+	SILENT (R.string.if_silent), ALARMS (R.string.if_alarms), PRIORITY (R.string.if_priority), NORMAL (R.string.if_unknown), UNKNOWN (R.string.if_unknown);
 
-	private String desc;
+	private int desc;
 
-	private InterruptionFilter(String desc) {
+	private InterruptionFilter(int desc) {
 		this.desc = desc;
 	}
 
-	public String toString() {
+	public int getDescription() {
 		return desc;
+	}
+
+	public static InterruptionFilter safeValueOf(String value) {
+		try {
+			return valueOf(value);
+		} catch (IllegalArgumentException e) {
+			return InterruptionFilter.UNKNOWN;
+		}
 	}
 }

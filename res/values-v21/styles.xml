@@ -18,6 +18,11 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <resources>
-	<style name="AppBaseTheme" parent="android:Theme.Holo.Light">
+	<style name="AppBaseTheme" parent="android:Theme.Material.Light.DarkActionBar">
+		<item name="android:actionBarStyle">@style/AppActionBarStyle</item>
+	</style>
+
+	<style name="AppActionBarStyle" parent="@android:style/Widget.Holo.Light.ActionBar">
+		<item name="android:background">@color/orangedark</item>
 	</style>
 </resources>

@@ -18,44 +18,48 @@
  */
 package uk.me.sa.android.do_not_disturb.ui;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.androidannotations.annotations.AfterInject;
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
+import org.androidannotations.annotations.UiThread;
 
-import uk.me.sa.android.do_not_disturb.data.InterruptionFilter;
 import uk.me.sa.android.do_not_disturb.data.Rule;
+import uk.me.sa.android.do_not_disturb.data.RulesDAO;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.google.common.collect.ImmutableList;
+
 @EBean
 public class RuleListAdapter extends BaseAdapter {
-	List<Rule> rules = new ArrayList<Rule>();
+	List<Rule> rules = ImmutableList.of();
 
 	@RootContext
 	Context context;
 
+	@Bean
+	RulesDAO db;
+
 	@AfterInject
 	void initAdapter() {
-		Rule rule = new Rule(1);
-		rule.setEnabled(true);
-		rule.name = "Test 1";
-		rule.startHour = 23;
-		rule.endHour = 7;
-		rule.level = InterruptionFilter.PRIORITY;
-		rules.add(rule);
+		loadRules();
+	}
 
-		rule = new Rule(2);
-		rule.setEnabled(true);
-		rule.name = "Test 2";
-		rule.startHour = 8;
-		rule.endHour = 17;
-		rule.level = InterruptionFilter.PRIORITY;
-		rules.add(rule);
+	@Background
+	void loadRules() {
+		updateRules(ImmutableList.sortedCopyOf(db.getRules()));
+	}
+
+	@UiThread
+	void updateRules(List<Rule> rules) {
+		this.rules = rules;
+		notifyDataSetChanged();
 	}
 
 	@Override

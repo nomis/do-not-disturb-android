@@ -20,4 +20,6 @@
 <resources>
 	<dimen name="outerPadding">10dp</dimen>
 	<dimen name="innerPadding">10dp</dimen>
+	<dimen name="keyTextSize">18sp</dimen>
+	<dimen name="valueTextSize">14sp</dimen>
 </resources>

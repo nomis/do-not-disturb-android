@@ -21,12 +21,33 @@
 	<string name="app_name">DnD Rules</string>
 	<string name="menu_access">Notification Access</string>
 
+	<string name="rule_name">Rule name</string>
+	<string name="days">Days</string>
+	<string name="start_time">Start time</string>
+	<string name="end_time">End time</string>
+	<string name="level">Do not disturb"</string>
+
+	<string name="fmt_start_time">%1$02d:%2$02d</string>
+	<string name="fmt_end_time_same_day">%1$02d:%2$02d</string>
+	<string name="fmt_end_time_next_day">%1$02d:%2$02d next day</string>
+	<string name="fmt_day_range">%1$s-%2$s</string>
+	<string name="days_separator">, </string>
+	<string name="no_days">None</string>
+	<string name="fmt_description">%1$s / %2$s to %3$s / %4$s</string>
+
+	<string name="if_silent">Total silence</string>
+	<string name="if_alarms">Alarms only</string>
+	<string name="if_priority">Priority only</string>
+	<string name="if_unknown">Unknown</string>
+
 	<string name="notification_enable">Enable</string>
 	<string name="notification_disable">Disable</string>
 	<string name="notification_edit">Edit</string>
 
 	<string name="add_rule">Add rule</string>
 	<string name="enter_rule_name">Enter rule name</string>
+
+	<string name="error_adding_rule">Error creating rule</string>
 
 	<string name="on">On</string>
 	<string name="off">Off</string>

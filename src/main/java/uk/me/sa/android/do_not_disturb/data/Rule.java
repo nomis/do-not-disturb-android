@@ -18,7 +18,6 @@
  */
 package uk.me.sa.android.do_not_disturb.data;
 
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -29,35 +28,47 @@ import uk.me.sa.android.do_not_disturb.util.TimeUtil;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.ImmutableBiMap;
 
-public class Rule implements Comparable<Rule> {
-	public final int id;
+public class Rule implements Comparable<Rule>, Cloneable {
+	private static ImmutableBiMap<Integer, Integer> CALENDAR_DAYS_TO_BITMAP;
+	private static ImmutableBiMap<Integer, Integer> CALENDAR_BITMAP_TO_DAYS;
+
+	static {
+		int value = 0;
+		ImmutableBiMap.Builder<Integer, Integer> builder = ImmutableBiMap.builder();
+		builder.put(Calendar.MONDAY, 1 << (value++));
+		builder.put(Calendar.TUESDAY, 1 << (value++));
+		builder.put(Calendar.WEDNESDAY, 1 << (value++));
+		builder.put(Calendar.THURSDAY, 1 << (value++));
+		builder.put(Calendar.FRIDAY, 1 << (value++));
+		builder.put(Calendar.SATURDAY, 1 << (value++));
+		builder.put(Calendar.SUNDAY, 1 << (value++));
+		CALENDAR_DAYS_TO_BITMAP = builder.build();
+		CALENDAR_BITMAP_TO_DAYS = CALENDAR_DAYS_TO_BITMAP.inverse();
+	}
+
+	private long id;
 	private boolean enabled = true;
 	private boolean temporarilyDisabled = false;
 
-	public String name;
-	public final Set<Integer> days = new HashSet<Integer>();
-	public int startHour;
-	public int startMinute;
-	public int endHour;
-	public int endMinute;
-	public InterruptionFilter level = InterruptionFilter.PRIORITY;
+	private String name;
+	private int days;
+	private int startHour;
+	private int startMinute;
+	private int endHour;
+	private int endMinute;
+	private InterruptionFilter level = InterruptionFilter.PRIORITY;
 
-	public Rule(int id) {
-		this.id = id;
+	public Rule() {
 	}
 
-	public Rule(Rule rule) {
-		this(rule.id);
-		this.enabled = rule.enabled;
-		this.temporarilyDisabled = rule.temporarilyDisabled;
-		this.name = rule.name;
-		this.days.addAll(rule.days);
-		this.startHour = rule.startHour;
-		this.startMinute = rule.startMinute;
-		this.endHour = rule.endHour;
-		this.endMinute = rule.endMinute;
-		this.level = rule.level;
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public boolean isEnabled() {
@@ -66,7 +77,6 @@ public class Rule implements Comparable<Rule> {
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
-		temporarilyDisabled = false;
 	}
 
 	public boolean isTemporarilyDisabled() {
@@ -75,6 +85,95 @@ public class Rule implements Comparable<Rule> {
 
 	public void setTemporarilyDisabled(boolean temporarilyDisabled) {
 		this.temporarilyDisabled = temporarilyDisabled;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	int getDays() {
+		return this.days;
+	}
+
+	void setDays(int days) {
+		this.days = days;
+	}
+
+	public Set<Integer> getCalendarDays() {
+		Set<Integer> calendarDays = new HashSet<Integer>();
+		int bitmapDay = 1;
+
+		for (int i = 0; i < Integer.SIZE; i++, bitmapDay <<= 1) {
+			if ((days & bitmapDay) != 0) {
+				Integer calendarDay = CALENDAR_BITMAP_TO_DAYS.get(bitmapDay);
+				if (calendarDay != null) {
+					calendarDays.add(calendarDay);
+				}
+			}
+		}
+
+		return calendarDays;
+	}
+
+	public void setCalendarDays(Set<Integer> calendarDays) {
+		int value = 0;
+
+		for (Integer calendarDay : calendarDays) {
+			Integer bitmapDay = CALENDAR_DAYS_TO_BITMAP.get(calendarDay);
+			if (bitmapDay != null) {
+				value |= bitmapDay;
+			}
+		}
+
+		this.days = value;
+	}
+
+	public int getStartHour() {
+		return startHour;
+	}
+
+	public void setStartHour(int startHour) {
+		this.startHour = startHour;
+	}
+
+	public int getStartMinute() {
+		return startMinute;
+	}
+
+	public void setStartMinute(int startMinute) {
+		this.startMinute = startMinute;
+	}
+
+	public int getEndHour() {
+		return endHour;
+	}
+
+	public void setEndHour(int endHour) {
+		this.endHour = endHour;
+	}
+
+	public int getEndMinute() {
+		return endMinute;
+	}
+
+	public void setEndMinute(int endMinute) {
+		this.endMinute = endMinute;
+	}
+
+	public InterruptionFilter getLevel() {
+		return level;
+	}
+
+	public void setLevel(InterruptionFilter level) {
+		this.level = level;
+	}
+
+	public boolean isEndNextDay() {
+		return TimeUtil.compareHourMinute(endHour, endMinute, startHour, startMinute) <= 0;
 	}
 
 	public boolean isActive(Date when) {
@@ -87,11 +186,10 @@ public class Rule implements Comparable<Rule> {
 
 		boolean beforeStart = TimeUtil.compareHourMinute(c, startHour, startMinute) < 0;
 		boolean beforeEnd = TimeUtil.compareHourMinute(c, endHour, endMinute) < 0;
-		boolean endNextDay = TimeUtil.compareHourMinute(endHour, endMinute, startHour, startMinute) <= 0;
 
-		if (endNextDay) {
+		if (isEndNextDay()) {
 			if (!beforeStart) {
-				return days.contains(c.get(Calendar.DAY_OF_WEEK));
+				return (days & CALENDAR_DAYS_TO_BITMAP.get(c.get(Calendar.DAY_OF_WEEK))) != 0;
 			}
 
 			if (!beforeEnd) {
@@ -99,9 +197,9 @@ public class Rule implements Comparable<Rule> {
 			}
 
 			c.add(Calendar.DATE, -1);
-			return days.contains(c.get(Calendar.DAY_OF_WEEK));
+			return (days & CALENDAR_DAYS_TO_BITMAP.get(c.get(Calendar.DAY_OF_WEEK))) != 0;
 		} else {
-			if (!days.contains(c.get(Calendar.DAY_OF_WEEK))) {
+			if ((days & CALENDAR_DAYS_TO_BITMAP.get(c.get(Calendar.DAY_OF_WEEK))) == 0) {
 				return false;
 			}
 
@@ -120,31 +218,30 @@ public class Rule implements Comparable<Rule> {
 
 	@Override
 	public int hashCode() {
-		return Integer.hashCode(id);
-	}
-
-	private long daysBitmap() {
-		long bitmap = 0;
-
-		for (int value : days) {
-			bitmap |= 1 << value;
-		}
-
-		return bitmap;
+		return Long.hashCode(id);
 	}
 
 	@Override
 	public int compareTo(Rule o) {
 		Preconditions.checkNotNull(o);
-		return ComparisonChain.start().compare(name, o.name).compare(level, o.level).compare(daysBitmap(), o.daysBitmap()).compare(startHour, o.startHour)
+		return ComparisonChain.start().compare(name, o.name).compare(level, o.level).compare(days, o.days).compare(startHour, o.startHour)
 				.compare(startMinute, o.startMinute).compare(endHour, o.endHour).compare(endMinute, o.endMinute).compare(id, o.id)
 				.compareTrueFirst(enabled, o.enabled).compareTrueFirst(temporarilyDisabled, o.temporarilyDisabled).result();
 	}
 
 	@Override
 	public String toString() {
-		return "Rule[name=" + name + ",level=" + level + ",days=" + Arrays.toString(days.toArray())
+		return "Rule[id=" + id + ",name=" + name + ",level=" + level.name() + ",days=" + days
 				+ String.format(",start=%02d:%02d,end=%02d:%02d", startHour, startMinute, endHour, endMinute) + ",enabled=" + enabled + ",temporarilyDisabled="
 				+ temporarilyDisabled + "]";
+	}
+
+	@Override
+	public Rule clone() {
+		try {
+			return (Rule)super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

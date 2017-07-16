@@ -20,6 +20,7 @@ package uk.me.sa.android.do_not_disturb.data;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.junit.Assert;
@@ -28,10 +29,12 @@ import org.junit.Test;
 public class TestRule {
 	@Test
 	public void isActiveSameDay() {
-		Rule rule = new Rule(0);
-		rule.days.add(Calendar.SUNDAY);
-		rule.startHour = 15;
-		rule.endHour = 23;
+		Rule rule = new Rule();
+		Set<Integer> days = rule.getCalendarDays();
+		days.add(Calendar.SUNDAY);
+		rule.setCalendarDays(days);
+		rule.setStartHour(15);
+		rule.setEndHour(23);
 
 		Calendar c = GregorianCalendar.getInstance();
 		c.setTimeZone(TimeZone.getTimeZone("Europe/London"));
