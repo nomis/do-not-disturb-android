@@ -42,7 +42,7 @@ public class DialogUtil {
 						if (listener != null) {
 							String text = editText.getText().toString();
 
-							if (TextUtils.getTrimmedLength(text) > 0) {
+							if (validateText(text)) {
 								listener.onInputText(text);
 							}
 						}
@@ -51,10 +51,11 @@ public class DialogUtil {
 		dialog.setOnShowListener(new DialogInterface.OnShowListener() {
 			@Override
 			public void onShow(DialogInterface dialog) {
-				((AlertDialog)dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+				((AlertDialog)dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(validateText(editText.getText()));
 			}
 		});
 
+		editText.setSingleLine(true);
 		editText.setText(initialValue);
 		editText.setHint(hintId);
 		editText.addTextChangedListener(new TextWatcher() {
@@ -68,10 +69,14 @@ public class DialogUtil {
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(TextUtils.getTrimmedLength(s) > 0);
+				dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(validateText(s));
 			}
 		});
 
 		dialog.show();
+	}
+
+	private static boolean validateText(CharSequence value) {
+		return TextUtils.getTrimmedLength(value) > 0;
 	}
 }

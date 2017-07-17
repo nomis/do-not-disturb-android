@@ -20,20 +20,24 @@ package uk.me.sa.android.do_not_disturb.ui;
 
 import org.androidannotations.annotations.AfterExtras;
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.me.sa.android.do_not_disturb.R;
-import uk.me.sa.android.do_not_disturb.data.Rule;
-import uk.me.sa.android.do_not_disturb.data.RulesDAO;
 import android.app.Activity;
 import android.content.Intent;
 import android.widget.Switch;
 import android.widget.TextView;
+import uk.me.sa.android.do_not_disturb.R;
+import uk.me.sa.android.do_not_disturb.data.Rule;
+import uk.me.sa.android.do_not_disturb.data.RulesDAO;
+import uk.me.sa.android.do_not_disturb.ui.DialogUtil.InputTextListener;
 
 @EActivity(R.layout.edit_rule)
 public class EditRuleActivity extends Activity {
@@ -96,6 +100,7 @@ public class EditRuleActivity extends Activity {
 	}
 
 	@AfterViews
+	@UiThread
 	void showRule() {
 		log.debug("Show {}", rule);
 
@@ -107,5 +112,27 @@ public class EditRuleActivity extends Activity {
 		start.setText(ruleText.getStartTime(rule));
 		end.setText(ruleText.getEndTime(rule));
 		level.setText(ruleText.getLevel(rule));
+	}
+
+	@Click(R.id.name_row)
+	void editName() {
+		DialogUtil.inputText(this, R.string.rule_name, rule.getName(), R.string.enter_rule_name, new InputTextListener() {
+			@Override
+			public void onInputText(final String value) {
+				saveRule(new Runnable() {
+					public void run() {
+						rule.setName(value);
+					}
+				});
+			}
+		});
+	}
+
+	@Background(serial = "save")
+	void saveRule(Runnable changes) {
+		changes.run();
+		db.updateRule(rule);
+
+		showRule();
 	}
 }
