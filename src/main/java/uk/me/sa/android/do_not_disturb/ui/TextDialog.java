@@ -27,6 +27,7 @@ import android.text.Editable;
 import android.text.TextUtils.TruncateAt;
 import android.text.TextWatcher;
 import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -73,13 +74,6 @@ public abstract class TextDialog {
 			}
 		}).setNegativeButton(android.R.string.cancel, null).create();
 
-		alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-			@Override
-			public void onShow(DialogInterface dialog) {
-				onTextChanged(editText.getText());
-			}
-		});
-
 		editText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -101,6 +95,8 @@ public abstract class TextDialog {
 
 		alertDialog.create();
 		alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+		alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+		onTextChanged(editText.getText());
 		alertDialog.show();
 	}
 
