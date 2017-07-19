@@ -122,21 +122,23 @@ public class RulesDAO extends SQLiteOpenHelper {
 		return id != -1;
 	}
 
-	public void updateRule(Rule rule) {
+	public boolean updateRule(Rule rule) {
 		log.info("Update {}", rule);
 
+		int rows;
 		ContentValues values = toContentValues(rule);
 
 		SQLiteDatabase db = getWritableDatabase();
 		db.beginTransaction();
 		try {
-			db.update(RULES_TABLE_NAME, values, RULES_COLUMN_ID + " = ?", new String[] { String.valueOf(rule.getId()) });
+			rows = db.update(RULES_TABLE_NAME, values, RULES_COLUMN_ID + " = ?", new String[] { String.valueOf(rule.getId()) });
 			db.setTransactionSuccessful();
 		} finally {
 			db.endTransaction();
 		}
 
 		db.close();
+		return rows > 0;
 	}
 
 	public void deleteRule(Rule rule) {
@@ -176,6 +178,28 @@ public class RulesDAO extends SQLiteOpenHelper {
 		db.beginTransaction();
 		try {
 			Cursor c = db.query(RULES_TABLE_NAME, null, RULES_COLUMN_ID + " = ?", new String[] { String.valueOf(id) }, null, null, null);
+			if (c.moveToNext()) {
+				rule = loadRuleFromCursor(c);
+			}
+			c.close();
+			db.setTransactionSuccessful();
+		} finally {
+			db.endTransaction();
+		}
+
+		db.close();
+
+		log.info("Get rule: {}", rule);
+		return rule;
+	}
+
+	public Rule getRule(String name) {
+		Rule rule = null;
+
+		SQLiteDatabase db = getReadableDatabase();
+		db.beginTransaction();
+		try {
+			Cursor c = db.query(RULES_TABLE_NAME, null, RULES_COLUMN_NAME + " = ?", new String[] { name }, null, null, null);
 			if (c.moveToNext()) {
 				rule = loadRuleFromCursor(c);
 			}

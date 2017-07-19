@@ -24,7 +24,9 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 
+import uk.me.sa.android.do_not_disturb.R;
 import uk.me.sa.android.do_not_disturb.util.TimeUtil;
+import android.text.TextUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ComparisonChain;
@@ -48,7 +50,7 @@ public class Rule implements Comparable<Rule>, Cloneable {
 		CALENDAR_BITMAP_TO_DAYS = CALENDAR_DAYS_TO_BITMAP.inverse();
 	}
 
-	private long id;
+	private long id = 0;
 	private boolean enabled = true;
 	private boolean temporarilyDisabled = false;
 
@@ -93,6 +95,20 @@ public class Rule implements Comparable<Rule>, Cloneable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Integer isNameValid(RulesDAO db, String value) {
+		if (TextUtils.getTrimmedLength(value) > 0) {
+			Rule other = db.getRule(value);
+
+			if (other == null || id == other.id) {
+				return null;
+			} else {
+				return R.string.rule_name_in_use;
+			}
+		} else {
+			return R.string.rule_name_empty;
+		}
 	}
 
 	int getDays() {

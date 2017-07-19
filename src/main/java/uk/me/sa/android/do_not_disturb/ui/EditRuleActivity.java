@@ -20,7 +20,6 @@ package uk.me.sa.android.do_not_disturb.ui;
 
 import org.androidannotations.annotations.AfterExtras;
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
@@ -30,14 +29,14 @@ import org.androidannotations.annotations.ViewById;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.text.TextUtils;
-import android.widget.Switch;
-import android.widget.TextView;
 import uk.me.sa.android.do_not_disturb.R;
 import uk.me.sa.android.do_not_disturb.data.Rule;
 import uk.me.sa.android.do_not_disturb.data.RulesDAO;
+import android.app.Activity;
+import android.content.Intent;
+import android.widget.Switch;
+import android.widget.TextView;
+import android.widget.Toast;
 
 @EActivity(R.layout.edit_rule)
 public class EditRuleActivity extends Activity {
@@ -95,11 +94,13 @@ public class EditRuleActivity extends Activity {
 			return;
 		}
 
-		rule = db.getRule(id);
-		if (rule == null) {
-			log.error("Rule {} does not exist", id);
-			finish();
-			return;
+		synchronized (this) {
+			rule = db.getRule(id);
+			if (rule == null) {
+				log.error("Rule {} does not exist", id);
+				finish();
+				return;
+			}
 		}
 	}
 
@@ -122,33 +123,36 @@ public class EditRuleActivity extends Activity {
 	void editName() {
 		new TextDialog(this, R.string.rule_name, rule.getName(), R.string.enter_rule_name) {
 			void onTextChanged(String value) {
-				if (TextUtils.getTrimmedLength(value) > 0) {
-					setValid(true);
-				} else {
-					setValid(false);
-					setErrorMessage("blah");
+				synchronized (this) {
+					Integer error = rule.isNameValid(db, value);
+					if (error == null) {
+						setValid();
+					} else {
+						setInvalid(error);
+					}
 				}
 			}
 
 			void onSuccess(final String value) {
-				if (TextUtils.getTrimmedLength(value) > 0) {
-					rule.setName(value);
-					showRule();
-					saveRule(new UpdateRule() {
-						public void apply(Rule rule) {
-							rule.setName(value);
-						}
-					});
+				synchronized (this) {
+					Integer error = rule.isNameValid(db, value);
+					if (error == null) {
+						rule.setName(value);
+						saveRule();
+					} else {
+						Toast.makeText(EditRuleActivity.this, getResources().getString(R.string.error_updating_rule, getResources().getString(error)),
+								Toast.LENGTH_SHORT).show();
+					}
 				}
 			}
 		};
 	}
 
-	@Background(serial = "save")
-	void saveRule(UpdateRule changes) {
-		Rule temp = db.getRule(rule.getId());
-		changes.apply(temp);
-		db.updateRule(temp);
+	void saveRule() {
+		if (!db.updateRule(rule)) {
+			Toast.makeText(this, getResources().getString(R.string.error_updating_rule, getResources().getString(R.string.database_write_failed)),
+					Toast.LENGTH_SHORT).show();
+		}
 		rule = db.getRule(rule.getId());
 
 		showRule();

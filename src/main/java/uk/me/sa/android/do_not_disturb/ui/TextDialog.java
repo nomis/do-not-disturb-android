@@ -18,6 +18,7 @@
  */
 package uk.me.sa.android.do_not_disturb.ui;
 
+import uk.me.sa.android.do_not_disturb.R;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,11 +27,9 @@ import android.text.Editable;
 import android.text.TextUtils.TruncateAt;
 import android.text.TextWatcher;
 import android.view.ViewGroup.LayoutParams;
-import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import uk.me.sa.android.do_not_disturb.R;
 
 public abstract class TextDialog {
 	private final AlertDialog alertDialog;
@@ -41,12 +40,11 @@ public abstract class TextDialog {
 		final LinearLayout layout = new LinearLayout(context);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		layout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-		layout.setPadding(R.dimen.dialogPadding, R.dimen.dialogPadding, R.dimen.dialogPadding, R.dimen.dialogPadding);
+		int dialogPadding = context.getResources().getDimensionPixelSize(R.dimen.dialogPadding);
+		layout.setPadding(dialogPadding, layout.getPaddingTop(), dialogPadding, layout.getPaddingBottom());
 
 		editText = new EditText(context);
-		MarginLayoutParams editTextMargins = new MarginLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-		editTextMargins.bottomMargin = R.dimen.innerPadding;
-		editText.setLayoutParams(editTextMargins);
+		editText.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		editText.setSingleLine(true);
 		layout.addView(editText);
 
@@ -109,12 +107,14 @@ public abstract class TextDialog {
 		alertDialog.show();
 	}
 
-	protected void setValid(boolean valid) {
-		alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(valid);
+	protected void setValid() {
+		alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+		errorMessage.setText(null);
 	}
 
-	protected void setErrorMessage(CharSequence value) {
-		errorMessage.setText(value);
+	protected void setInvalid(int errorText) {
+		alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+		errorMessage.setText(errorText);
 	}
 
 	abstract void onTextChanged(String value);

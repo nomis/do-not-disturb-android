@@ -30,7 +30,6 @@ import org.androidannotations.annotations.ViewById;
 import uk.me.sa.android.do_not_disturb.R;
 import uk.me.sa.android.do_not_disturb.data.Rule;
 import uk.me.sa.android.do_not_disturb.data.RulesDAO;
-import uk.me.sa.android.do_not_disturb.ui.DialogUtil.InputTextListener;
 import android.app.Activity;
 import android.content.Intent;
 import android.provider.Settings;
@@ -70,12 +69,26 @@ public class MainActivity extends Activity {
 	}
 
 	void addRule() {
-		DialogUtil.inputText(this, R.string.add_rule, null, R.string.enter_rule_name, new InputTextListener() {
-			@Override
-			public void onInputText(String value) {
-				addRule(value);
+		new TextDialog(this, R.string.add_rule, null, R.string.enter_rule_name) {
+			void onTextChanged(String value) {
+				Integer error = new Rule().isNameValid(db, value);
+				if (error == null) {
+					setValid();
+				} else {
+					setInvalid(error);
+				}
 			}
-		});
+
+			void onSuccess(final String value) {
+				Integer error = new Rule().isNameValid(db, value);
+				if (error == null) {
+					addRule(value);
+				} else {
+					Toast.makeText(MainActivity.this, getResources().getString(R.string.error_adding_rule, getResources().getString(error)), Toast.LENGTH_SHORT)
+							.show();
+				}
+			}
+		};
 	}
 
 	@Background
