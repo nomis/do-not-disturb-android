@@ -145,7 +145,15 @@ public class Rule implements Comparable<Rule>, Cloneable {
 			}
 		}
 
-		this.days = value;
+		days = value;
+	}
+
+	public void setCalendarDay(int calendarDay, boolean enabled) {
+		if (enabled) {
+			days |= CALENDAR_DAYS_TO_BITMAP.get(calendarDay);
+		} else {
+			days &= ~CALENDAR_DAYS_TO_BITMAP.get(calendarDay);
+		}
 	}
 
 	public int getStartHour() {

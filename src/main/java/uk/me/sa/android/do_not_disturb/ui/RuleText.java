@@ -47,8 +47,8 @@ public class RuleText {
 		Integer last = null;
 		for (int i = 0; i < 7; i++) {
 			if (days.contains(c.get(Calendar.DAY_OF_WEEK))) {
-				if (first != null) {
 					first = c.get(Calendar.DAY_OF_WEEK);
+				if (first == null) {
 				}
 				last = c.get(Calendar.DAY_OF_WEEK);
 
@@ -63,7 +63,7 @@ public class RuleText {
 					sb.append(context.getResources().getString(R.string.days_separator));
 				}
 
-				if (first == last) {
+				if (last == null || first == last) {
 					sb.append(dayOfWeek.format(first));
 				} else {
 					sb.append(context.getResources().getString(R.string.fmt_day_range, dayOfWeek.format(first), dayOfWeek.format(last)));
