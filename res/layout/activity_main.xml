@@ -27,7 +27,7 @@
 	<ListView
 		android:id="@+id/rules"
 		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
+		android:layout_height="fill_parent"
 		android:divider="?android:attr/listDivider"
 		android:showDividers="middle|end">
 	</ListView>
