@@ -19,7 +19,6 @@
 package uk.me.sa.android.do_not_disturb.ui;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ItemClick;
@@ -70,38 +69,41 @@ public class MainActivity extends Activity {
 
 	void addRule() {
 		new TextDialog(this, R.string.add_rule, null, R.string.enter_rule_name) {
-			void onTextChanged(String value) {
-				Integer error = new Rule().isNameValid(db, value);
-				if (error == null) {
-					setValid();
-				} else {
-					setInvalid(error);
+			@Override
+			Integer checkText(String value) {
+				synchronized (this) {
+					return new Rule().isNameValid(db, value);
 				}
 			}
 
-			void onSuccess(final String value) {
+			@Override
+			boolean saveText(final String value) {
 				Integer error = new Rule().isNameValid(db, value);
 				if (error == null) {
-					addRule(value);
+					return addRule(value);
 				} else {
 					Toast.makeText(MainActivity.this, getResources().getString(R.string.error_adding_rule, getResources().getString(error)), Toast.LENGTH_SHORT)
 							.show();
+					return false;
 				}
+			}
+
+			@Override
+			void onSuccess() {
+				adapter.loadRules(); // TODO use broadcast
 			}
 		};
 	}
 
-	@Background
-	void addRule(String name) {
+	boolean addRule(String name) {
 		Rule rule = new Rule();
 
 		rule.setName(name);
 		if (db.addRule(rule)) {
-			adapter.loadRules(); // TODO use broadcast
-
-			editRule(rule);
+			return true;
 		} else {
 			Toast.makeText(this, R.string.error_adding_rule, Toast.LENGTH_SHORT).show();
+			return false;
 		}
 	}
 

@@ -22,7 +22,7 @@ import uk.me.sa.android.do_not_disturb.R;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.Handler;
+import android.os.AsyncTask;
 import android.text.Editable;
 import android.text.TextUtils.TruncateAt;
 import android.text.TextWatcher;
@@ -57,24 +57,26 @@ public abstract class TextDialog {
 
 		alertDialog = new AlertDialog.Builder(context).setView(layout).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
-				final String text = editText.getText().toString();
-				new Handler().post(new Runnable() {
-					public void run() {
-						onSuccess(text);
+				new AsyncTask<String, Void, Boolean>() {
+					@Override
+					protected Boolean doInBackground(String... params) {
+						return saveText(params[0]);
 					}
-				});
+
+					@Override
+					protected void onPostExecute(Boolean result) {
+						if (result) {
+							onSuccess();
+						}
+					}
+				}.execute(editText.getText().toString());
 			}
 		}).setNegativeButton(android.R.string.cancel, null).create();
 
 		alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
 			@Override
 			public void onShow(DialogInterface dialog) {
-				final String text = editText.getText().toString();
-				new Handler().post(new Runnable() {
-					public void run() {
-						onTextChanged(text);
-					}
-				});
+				onTextChanged(editText.getText());
 			}
 		});
 
@@ -89,12 +91,7 @@ public abstract class TextDialog {
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				final String text = s.toString();
-				new Handler().post(new Runnable() {
-					public void run() {
-						TextDialog.this.onTextChanged(text);
-					}
-				});
+				TextDialog.this.onTextChanged(s);
 			}
 		});
 
@@ -107,17 +104,55 @@ public abstract class TextDialog {
 		alertDialog.show();
 	}
 
-	protected void setValid() {
+	private void onTextChanged(Editable text) {
+		new AsyncTask<String, Void, Integer>() {
+			@Override
+			protected Integer doInBackground(String... params) {
+				return checkText(params[0]);
+			}
+
+			@Override
+			protected void onPostExecute(Integer result) {
+				if (result == null) {
+					setValid();
+				} else {
+					setInvalid(result);
+				}
+			}
+		}.execute(text.toString());
+	}
+
+	private void setValid() {
 		alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
 		errorMessage.setText(null);
 	}
 
-	protected void setInvalid(int errorText) {
+	private void setInvalid(int errorText) {
 		alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
 		errorMessage.setText(errorText);
 	}
 
-	abstract void onTextChanged(String value);
+	/**
+	 * Executed on a background thread to check the text.
+	 * 
+	 * @param value
+	 *            text to be checked
+	 * @return string resource to display if the text is invalid
+	 */
+	abstract Integer checkText(String value);
 
-	abstract void onSuccess(String value);
+	/**
+	 * Executed on a background thread to save the text
+	 * 
+	 * @param value
+	 *            text to be saved
+	 * 
+	 * @return true if the text is valid and has been saved
+	 */
+	abstract boolean saveText(String value);
+
+	/**
+	 * Executed on the UI thread if the text has been saved
+	 */
+	abstract void onSuccess();
 }

@@ -24,7 +24,8 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
-import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.SupposeBackground;
+import org.androidannotations.annotations.SupposeUiThread;
 import org.androidannotations.annotations.ViewById;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,7 +106,7 @@ public class EditRuleActivity extends Activity {
 	}
 
 	@AfterViews
-	@UiThread
+	@SupposeUiThread
 	void showRule() {
 		log.debug("Show {}", rule);
 
@@ -122,39 +123,44 @@ public class EditRuleActivity extends Activity {
 	@Click(R.id.name_row)
 	void editName() {
 		new TextDialog(this, R.string.rule_name, rule.getName(), R.string.enter_rule_name) {
-			void onTextChanged(String value) {
+			@Override
+			Integer checkText(String value) {
 				synchronized (this) {
-					Integer error = rule.isNameValid(db, value);
-					if (error == null) {
-						setValid();
-					} else {
-						setInvalid(error);
-					}
+					return rule.isNameValid(db, value);
 				}
 			}
 
-			void onSuccess(final String value) {
+			@Override
+			boolean saveText(final String value) {
 				synchronized (this) {
 					Integer error = rule.isNameValid(db, value);
 					if (error == null) {
 						rule.setName(value);
-						saveRule();
+						return saveRule();
 					} else {
 						Toast.makeText(EditRuleActivity.this, getResources().getString(R.string.error_updating_rule, getResources().getString(error)),
 								Toast.LENGTH_SHORT).show();
+						return false;
 					}
 				}
+			}
+
+			@Override
+			void onSuccess() {
+				showRule();
 			}
 		};
 	}
 
-	void saveRule() {
-		if (!db.updateRule(rule)) {
+	@SupposeBackground
+	boolean saveRule() {
+		if (db.updateRule(rule)) {
+			rule = db.getRule(rule.getId());
+			return true;
+		} else {
 			Toast.makeText(this, getResources().getString(R.string.error_updating_rule, getResources().getString(R.string.database_write_failed)),
 					Toast.LENGTH_SHORT).show();
+			return false;
 		}
-		rule = db.getRule(rule.getId());
-
-		showRule();
 	}
 }
