@@ -18,9 +18,12 @@
  */
 package uk.me.sa.android.do_not_disturb.ui;
 
-import java.text.SimpleDateFormat;
+import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.androidannotations.annotations.EBean;
@@ -30,29 +33,52 @@ import uk.me.sa.android.do_not_disturb.R;
 import uk.me.sa.android.do_not_disturb.data.Rule;
 import android.content.Context;
 
+import com.google.common.collect.ImmutableMap;
+
 @EBean
 public class RuleText {
 	@RootContext
 	Context context;
 
-	public String getDays(Rule rule) {
-		StringBuilder sb = new StringBuilder();
-		Set<Integer> days = rule.getCalendarDays();
-		SimpleDateFormat dayOfWeek = new SimpleDateFormat("EEE");
+	Map<String, Integer> shortWeekdays;
+	Map<String, Integer> longWeekdays;
+
+	public RuleText(Context context) {
+		ImmutableMap.Builder<String, Integer> buildShortWeekdays = ImmutableMap.<String, Integer>builder();
+		ImmutableMap.Builder<String, Integer> buildLongWeekdays = ImmutableMap.<String, Integer>builder();
+		DateFormatSymbols dateFormatSymbols = new DateFormatSymbols();
+		String[] shortWeekdayStrings = dateFormatSymbols.getShortWeekdays();
+		String[] longWeekdayStrings = dateFormatSymbols.getWeekdays();
+
 		Calendar c = GregorianCalendar.getInstance();
 		c.clear();
 		c.set(Calendar.DAY_OF_WEEK, c.getFirstDayOfWeek());
 
-		Integer first = null;
-		Integer last = null;
-		for (int i = 0; i < 7; i++) {
-			if (days.contains(c.get(Calendar.DAY_OF_WEEK))) {
-					first = c.get(Calendar.DAY_OF_WEEK);
-				if (first == null) {
-				}
-				last = c.get(Calendar.DAY_OF_WEEK);
+		for (int i = 0; i < 7; i++, c.add(Calendar.DAY_OF_WEEK, 1)) {
+			buildShortWeekdays.put(shortWeekdayStrings[c.get(Calendar.DAY_OF_WEEK)], c.get(Calendar.DAY_OF_WEEK));
+			buildLongWeekdays.put(longWeekdayStrings[c.get(Calendar.DAY_OF_WEEK)], c.get(Calendar.DAY_OF_WEEK));
+		}
 
-				if (i < 6) {
+		shortWeekdays = buildShortWeekdays.build();
+		longWeekdays = buildLongWeekdays.build();
+	}
+
+	public String getDays(Rule rule) {
+		StringBuilder sb = new StringBuilder();
+		Set<Integer> days = rule.getCalendarDays();
+
+		String first = null;
+		String last = null;
+		for (Iterator<Entry<String, Integer>> it = shortWeekdays.entrySet().iterator(); it.hasNext();) {
+			Entry<String, Integer> weekday = it.next();
+
+			if (days.contains(weekday.getValue())) {
+				if (first == null) {
+					first = weekday.getKey();
+				}
+				last = weekday.getKey();
+
+				if (it.hasNext()) {
 					// Check next day, except on the last day which must output any residual days
 					continue;
 				}
@@ -64,9 +90,9 @@ public class RuleText {
 				}
 
 				if (last == null || first == last) {
-					sb.append(dayOfWeek.format(first));
+					sb.append(first);
 				} else {
-					sb.append(context.getResources().getString(R.string.fmt_day_range, dayOfWeek.format(first), dayOfWeek.format(last)));
+					sb.append(context.getResources().getString(R.string.fmt_day_range, first, last));
 				}
 
 				first = last = null;
@@ -78,6 +104,14 @@ public class RuleText {
 		}
 
 		return sb.toString();
+	}
+
+	public Map<String, Integer> getShortWeekdays() {
+		return shortWeekdays;
+	}
+
+	public Map<String, Integer> getLongWeekdays() {
+		return longWeekdays;
 	}
 
 	public String getStartTime(Rule rule) {

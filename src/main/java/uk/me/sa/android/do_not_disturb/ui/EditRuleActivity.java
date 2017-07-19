@@ -18,6 +18,9 @@
  */
 package uk.me.sa.android.do_not_disturb.ui;
 
+import java.util.Map;
+import java.util.Set;
+
 import org.androidannotations.annotations.AfterExtras;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -34,10 +37,18 @@ import uk.me.sa.android.do_not_disturb.R;
 import uk.me.sa.android.do_not_disturb.data.Rule;
 import uk.me.sa.android.do_not_disturb.data.RulesDAO;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.primitives.Booleans;
 
 @EActivity(R.layout.edit_rule)
 public class EditRuleActivity extends Activity {
@@ -150,6 +161,42 @@ public class EditRuleActivity extends Activity {
 				showRule();
 			}
 		};
+	}
+
+	@Click(R.id.days_row)
+	void editDays() {
+		Map<String, Integer> weekdays = ruleText.getLongWeekdays();
+		final Integer[] orderedWeekdays = weekdays.values().toArray(new Integer[weekdays.size()]);
+		final Set<Integer> ruleDays = rule.getCalendarDays();
+		boolean[] checkedDays = Booleans.toArray(Collections2.transform(weekdays.values(), new Function<Integer, Boolean>() {
+			@Override
+			public Boolean apply(Integer input) {
+				return ruleDays.contains(input);
+			}
+		}));
+
+		new AlertDialog.Builder(this).setTitle(R.string.days).setPositiveButton(R.string.done, null)
+				.setMultiChoiceItems(weekdays.keySet().toArray(new String[weekdays.size()]), checkedDays, new OnMultiChoiceClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, final int which, final boolean isChecked) {
+						new AsyncTask<Void, Void, Boolean>() {
+							@Override
+							protected Boolean doInBackground(Void... params) {
+								synchronized (this) {
+									rule.setCalendarDay(orderedWeekdays[which], isChecked);
+									return saveRule();
+								}
+							}
+
+							@Override
+							protected void onPostExecute(Boolean result) {
+								if (result) {
+									showRule();
+								}
+							}
+						}.execute();
+					}
+				}).create().show();
 	}
 
 	@SupposeBackground
