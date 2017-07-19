@@ -24,7 +24,9 @@ import android.content.DialogInterface;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 public class DialogUtil {
 	private DialogUtil() {
@@ -35,8 +37,13 @@ public class DialogUtil {
 	}
 
 	public static void inputText(Context context, int titleId, String initialValue, int hintId, final InputTextListener listener) {
+		final LinearLayout layout = new LinearLayout(context);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		layout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		final EditText editText = new EditText(context);
-		final AlertDialog dialog = new AlertDialog.Builder(context).setTitle(titleId).setView(editText)
+		editText.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+		layout.addView(editText);
+		final AlertDialog alertDialog = new AlertDialog.Builder(context).setTitle(titleId).setView(layout)
 				.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						if (listener != null) {
@@ -48,10 +55,11 @@ public class DialogUtil {
 						}
 					}
 				}).setNegativeButton(android.R.string.cancel, null).create();
-		dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+		alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
 			@Override
 			public void onShow(DialogInterface dialog) {
-				((AlertDialog)dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(validateText(editText.getText()));
+				alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(validateText(editText.getText()));
 			}
 		});
 
@@ -69,11 +77,11 @@ public class DialogUtil {
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(validateText(s));
+				alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(validateText(s));
 			}
 		});
 
-		dialog.show();
+		alertDialog.show();
 	}
 
 	private static boolean validateText(CharSequence value) {

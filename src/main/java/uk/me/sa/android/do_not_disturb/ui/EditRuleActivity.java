@@ -32,12 +32,12 @@ import org.slf4j.LoggerFactory;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.text.TextUtils;
 import android.widget.Switch;
 import android.widget.TextView;
 import uk.me.sa.android.do_not_disturb.R;
 import uk.me.sa.android.do_not_disturb.data.Rule;
 import uk.me.sa.android.do_not_disturb.data.RulesDAO;
-import uk.me.sa.android.do_not_disturb.ui.DialogUtil.InputTextListener;
 
 @EActivity(R.layout.edit_rule)
 public class EditRuleActivity extends Activity {
@@ -45,6 +45,10 @@ public class EditRuleActivity extends Activity {
 
 	public static final String ACTION_EDIT = EditRuleActivity.class.getName() + ".EDIT";
 	public static final String EXTRA_RULE_ID = "RULE_ID";
+
+	interface UpdateRule {
+		public void apply(Rule rule);
+	}
 
 	@Bean
 	RuleText ruleText;
@@ -116,22 +120,36 @@ public class EditRuleActivity extends Activity {
 
 	@Click(R.id.name_row)
 	void editName() {
-		DialogUtil.inputText(this, R.string.rule_name, rule.getName(), R.string.enter_rule_name, new InputTextListener() {
-			@Override
-			public void onInputText(final String value) {
-				saveRule(new Runnable() {
-					public void run() {
-						rule.setName(value);
-					}
-				});
+		new TextDialog(this, R.string.rule_name, rule.getName(), R.string.enter_rule_name) {
+			void onTextChanged(String value) {
+				if (TextUtils.getTrimmedLength(value) > 0) {
+					setValid(true);
+				} else {
+					setValid(false);
+					setErrorMessage("blah");
+				}
 			}
-		});
+
+			void onSuccess(final String value) {
+				if (TextUtils.getTrimmedLength(value) > 0) {
+					rule.setName(value);
+					showRule();
+					saveRule(new UpdateRule() {
+						public void apply(Rule rule) {
+							rule.setName(value);
+						}
+					});
+				}
+			}
+		};
 	}
 
 	@Background(serial = "save")
-	void saveRule(Runnable changes) {
-		changes.run();
-		db.updateRule(rule);
+	void saveRule(UpdateRule changes) {
+		Rule temp = db.getRule(rule.getId());
+		changes.apply(temp);
+		db.updateRule(temp);
+		rule = db.getRule(rule.getId());
 
 		showRule();
 	}
