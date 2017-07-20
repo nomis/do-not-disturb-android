@@ -125,7 +125,7 @@ public class TestRuleText {
 		rule.setCalendarDay(Calendar.FRIDAY, true);
 		rule.setCalendarDay(Calendar.SATURDAY, true);
 		rule.setCalendarDay(Calendar.SUNDAY, true);
-		Assert.assertEquals("Mon-Sun", ruleText.getDays(rule));
+		Assert.assertEquals("Mon - Sun", ruleText.getDays(rule));
 	}
 
 	@Test
@@ -136,7 +136,7 @@ public class TestRuleText {
 		rule.setCalendarDay(Calendar.WEDNESDAY, true);
 		rule.setCalendarDay(Calendar.THURSDAY, true);
 		rule.setCalendarDay(Calendar.FRIDAY, true);
-		Assert.assertEquals("Mon-Fri", ruleText.getDays(rule));
+		Assert.assertEquals("Mon - Fri", ruleText.getDays(rule));
 	}
 
 	@Test
@@ -144,7 +144,7 @@ public class TestRuleText {
 		Rule rule = new Rule();
 		rule.setCalendarDay(Calendar.SATURDAY, true);
 		rule.setCalendarDay(Calendar.SUNDAY, true);
-		Assert.assertEquals("Sat-Sun", ruleText.getDays(rule));
+		Assert.assertEquals("Sat - Sun", ruleText.getDays(rule));
 	}
 
 	@Test
@@ -174,7 +174,7 @@ public class TestRuleText {
 		rule.setCalendarDay(Calendar.THURSDAY, true);
 		rule.setCalendarDay(Calendar.FRIDAY, true);
 		rule.setCalendarDay(Calendar.SUNDAY, true);
-		Assert.assertEquals("Mon-Tue, Thu-Fri, Sun", ruleText.getDays(rule));
+		Assert.assertEquals("Mon - Tue, Thu - Fri, Sun", ruleText.getDays(rule));
 	}
 
 	@Test
@@ -185,7 +185,7 @@ public class TestRuleText {
 		rule.setCalendarDay(Calendar.THURSDAY, true);
 		rule.setCalendarDay(Calendar.SATURDAY, true);
 		rule.setCalendarDay(Calendar.SUNDAY, true);
-		Assert.assertEquals("Mon, Wed-Thu, Sat-Sun", ruleText.getDays(rule));
+		Assert.assertEquals("Mon, Wed - Thu, Sat - Sun", ruleText.getDays(rule));
 	}
 
 	@Test
@@ -197,7 +197,7 @@ public class TestRuleText {
 		rule.setCalendarDay(Calendar.FRIDAY, true);
 		rule.setCalendarDay(Calendar.SATURDAY, true);
 		rule.setCalendarDay(Calendar.SUNDAY, true);
-		Assert.assertEquals("Mon-Wed, Fri-Sun", ruleText.getDays(rule));
+		Assert.assertEquals("Mon - Wed, Fri - Sun", ruleText.getDays(rule));
 	}
 
 	@Test
@@ -208,6 +208,6 @@ public class TestRuleText {
 		rule.setCalendarDay(Calendar.THURSDAY, true);
 		rule.setCalendarDay(Calendar.FRIDAY, true);
 		rule.setCalendarDay(Calendar.SUNDAY, true);
-		Assert.assertEquals("Mon, Wed-Fri, Sun", ruleText.getDays(rule));
+		Assert.assertEquals("Mon, Wed - Fri, Sun", ruleText.getDays(rule));
 	}
 }

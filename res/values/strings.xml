@@ -30,8 +30,8 @@
 	<string name="fmt_start_time">%1$02d:%2$02d</string>
 	<string name="fmt_end_time_same_day">%1$02d:%2$02d</string>
 	<string name="fmt_end_time_next_day">%1$02d:%2$02d next day</string>
-	<string name="fmt_day_range">%1$s-%2$s</string>
-	<string name="days_separator">, </string>
+	<string name="fmt_day_range">%1$s - %2$s</string>
+	<string name="days_separator">", "</string>
 	<string name="no_days">None</string>
 	<string name="fmt_description">%1$s / %2$s to %3$s / %4$s</string>
 
@@ -54,7 +54,7 @@
 	<string name="error_adding_rule">Error creating rule: %1$s</string>
 	<string name="error_updating_rule">Error updating rule: %1$s</string>
 	<string name="delete_rule">Delete rule</string>
-	<string name="confirm_delete_rule">Delete "%1$s" rule?</string>
+	<string name="confirm_delete_rule">Delete \"%1$s\" rule?</string>
 
 	<string name="on">On</string>
 	<string name="off">Off</string>
