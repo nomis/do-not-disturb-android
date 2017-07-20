@@ -33,22 +33,25 @@ import org.androidannotations.annotations.ViewById;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.me.sa.android.do_not_disturb.R;
-import uk.me.sa.android.do_not_disturb.data.Rule;
-import uk.me.sa.android.do_not_disturb.data.RulesDAO;
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.primitives.Booleans;
+
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.TimePickerDialog;
+import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
-import com.google.common.primitives.Booleans;
+import uk.me.sa.android.do_not_disturb.R;
+import uk.me.sa.android.do_not_disturb.data.Rule;
+import uk.me.sa.android.do_not_disturb.data.RulesDAO;
 
 @EActivity(R.layout.edit_rule)
 public class EditRuleActivity extends Activity {
@@ -132,7 +135,7 @@ public class EditRuleActivity extends Activity {
 	}
 
 	@Click(R.id.name_row)
-	void editName() {
+	synchronized void editName() {
 		new TextDialog(this, R.string.rule_name, rule.getName(), R.string.enter_rule_name) {
 			@Override
 			Integer checkText(String value) {
@@ -164,7 +167,7 @@ public class EditRuleActivity extends Activity {
 	}
 
 	@Click(R.id.days_row)
-	void editDays() {
+	synchronized void editDays() {
 		Map<String, Integer> weekdays = ruleText.getLongWeekdays();
 		final Integer[] orderedWeekdays = weekdays.values().toArray(new Integer[weekdays.size()]);
 		final Set<Integer> ruleDays = rule.getCalendarDays();
@@ -197,6 +200,58 @@ public class EditRuleActivity extends Activity {
 						}.execute();
 					}
 				}).create().show();
+	}
+
+	@Click(R.id.start_time_row)
+	synchronized void editStartTime() {
+		new TimePickerDialog(this, new OnTimeSetListener() {
+			@Override
+			public void onTimeSet(TimePicker view, final int hourOfDay, final int minute) {
+				new AsyncTask<Void, Void, Boolean>() {
+					@Override
+					protected Boolean doInBackground(Void... params) {
+						synchronized (this) {
+							rule.setStartHour(hourOfDay);
+							rule.setStartMinute(minute);
+							return saveRule();
+						}
+					}
+
+					@Override
+					protected void onPostExecute(Boolean result) {
+						if (result) {
+							showRule();
+						}
+					}
+				}.execute();
+			}
+		}, rule.getStartHour(), rule.getStartMinute(), true).show();
+	}
+
+	@Click(R.id.end_time_row)
+	synchronized void editEndTime() {
+		new TimePickerDialog(this, new OnTimeSetListener() {
+			@Override
+			public void onTimeSet(TimePicker view, final int hourOfDay, final int minute) {
+				new AsyncTask<Void, Void, Boolean>() {
+					@Override
+					protected Boolean doInBackground(Void... params) {
+						synchronized (this) {
+							rule.setEndHour(hourOfDay);
+							rule.setEndMinute(minute);
+							return saveRule();
+						}
+					}
+
+					@Override
+					protected void onPostExecute(Boolean result) {
+						if (result) {
+							showRule();
+						}
+					}
+				}.execute();
+			}
+		}, rule.getEndHour(), rule.getEndMinute(), true).show();
 	}
 
 	@SupposeBackground
