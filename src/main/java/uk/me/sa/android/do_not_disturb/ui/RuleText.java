@@ -182,6 +182,11 @@ public class RuleText {
 	}
 
 	public String getDescription(Rule rule) {
-		return String.format(context.getResources().getString(R.string.fmt_description, getDays(rule), getStartTime(rule), getEndTime(rule), getLevel(rule)));
+		if (rule.isEnabled()) {
+			return String.format(context.getResources().getString(R.string.fmt_description, getDaysSummary(rule), getStartTime(rule), getEndTime(rule),
+					getLevel(rule)));
+		} else {
+			return context.getResources().getString(R.string.off);
+		}
 	}
 }
