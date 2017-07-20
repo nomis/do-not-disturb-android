@@ -64,9 +64,15 @@ public class RuleText {
 	}
 
 	public String getDays(Rule rule) {
-		StringBuilder sb = new StringBuilder();
 		Set<Integer> days = rule.getCalendarDays();
 
+		if (days.isEmpty()) {
+			return context.getResources().getString(R.string.no_days);
+		} else if (days.size() == shortWeekdays.size()) {
+			return context.getResources().getString(R.string.all_days);
+		}
+
+		StringBuilder sb = new StringBuilder();
 		String first = null;
 		String last = null;
 		for (Iterator<Entry<String, Integer>> it = shortWeekdays.entrySet().iterator(); it.hasNext();) {
@@ -97,10 +103,6 @@ public class RuleText {
 
 				first = last = null;
 			}
-		}
-
-		if (sb.length() == 0) {
-			sb.append(context.getResources().getString(R.string.no_days));
 		}
 
 		return sb.toString();

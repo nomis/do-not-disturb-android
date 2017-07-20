@@ -125,7 +125,7 @@ public class TestRuleText {
 		rule.setCalendarDay(Calendar.FRIDAY, true);
 		rule.setCalendarDay(Calendar.SATURDAY, true);
 		rule.setCalendarDay(Calendar.SUNDAY, true);
-		Assert.assertEquals("Mon - Sun", ruleText.getDays(rule));
+		Assert.assertEquals("Every day", ruleText.getDays(rule));
 	}
 
 	@Test

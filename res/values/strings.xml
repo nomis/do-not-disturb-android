@@ -32,6 +32,7 @@
 	<string name="fmt_end_time_next_day">%1$02d:%2$02d next day</string>
 	<string name="fmt_day_range">%1$s - %2$s</string>
 	<string name="days_separator">", "</string>
+	<string name="all_days">Every day</string>
 	<string name="no_days">None</string>
 	<string name="fmt_description">%1$s / %2$s to %3$s / %4$s</string>
 
