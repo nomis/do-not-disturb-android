@@ -33,6 +33,7 @@ import uk.me.sa.android.do_not_disturb.R;
 import uk.me.sa.android.do_not_disturb.data.Rule;
 import android.content.Context;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 @EBean
@@ -41,6 +42,7 @@ public class RuleText {
 	Context context;
 
 	Map<String, Integer> shortWeekdays;
+	Map<String, Integer> shortWeekdaysReverse;
 	Map<String, Integer> longWeekdays;
 
 	public RuleText(Context context) {
@@ -60,10 +62,11 @@ public class RuleText {
 		}
 
 		shortWeekdays = buildShortWeekdays.build();
+		shortWeekdaysReverse = ImmutableMap.copyOf(ImmutableList.copyOf(shortWeekdays.entrySet()).reverse());
 		longWeekdays = buildLongWeekdays.build();
 	}
 
-	public String getDays(Rule rule) {
+	public String getDaysSummary(Rule rule) {
 		Set<Integer> days = rule.getCalendarDays();
 
 		if (days.isEmpty()) {
@@ -75,8 +78,15 @@ public class RuleText {
 		StringBuilder sb = new StringBuilder();
 		String first = null;
 		String last = null;
+		boolean fromStart = true;
+		String truncate = null;
 		for (Iterator<Entry<String, Integer>> it = shortWeekdays.entrySet().iterator(); it.hasNext();) {
 			Entry<String, Integer> weekday = it.next();
+
+			if (weekday.getKey().equals(truncate)) {
+				// Stop early if the days were checked backwards
+				break;
+			}
 
 			if (days.contains(weekday.getValue())) {
 				if (first == null) {
@@ -88,6 +98,25 @@ public class RuleText {
 					// Check next day, except on the last day which must output any residual days
 					continue;
 				}
+			} else if (fromStart && first != null) {
+				// Check backwards from the end
+				for (Iterator<Entry<String, Integer>> itReverse = shortWeekdaysReverse.entrySet().iterator(); itReverse.hasNext();) {
+					Entry<String, Integer> weekdayReverse = itReverse.next();
+
+					if (weekdayReverse.getKey().equals(weekday.getKey())) {
+						break;
+					}
+
+					if (days.contains(weekdayReverse.getValue())) {
+						first = truncate = weekdayReverse.getKey();
+					} else {
+						break;
+					}
+				}
+
+				fromStart = false;
+			} else {
+				fromStart = false;
 			}
 
 			if (first != null) {
@@ -95,13 +124,36 @@ public class RuleText {
 					sb.append(context.getResources().getString(R.string.days_separator));
 				}
 
-				if (last == null || first == last) {
+				if (last == null || first.equals(last)) {
 					sb.append(first);
 				} else {
 					sb.append(context.getResources().getString(R.string.fmt_day_range, first, last));
 				}
 
 				first = last = null;
+			}
+		}
+
+		return sb.toString();
+	}
+
+	public String getDays(Rule rule) {
+		Set<Integer> days = rule.getCalendarDays();
+
+		if (days.isEmpty()) {
+			return context.getResources().getString(R.string.no_days);
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (Iterator<Entry<String, Integer>> it = shortWeekdays.entrySet().iterator(); it.hasNext();) {
+			Entry<String, Integer> weekday = it.next();
+
+			if (days.contains(weekday.getValue())) {
+				if (sb.length() > 0) {
+					sb.append(context.getResources().getString(R.string.days_separator));
+				}
+
+				sb.append(weekday.getKey());
 			}
 		}
 

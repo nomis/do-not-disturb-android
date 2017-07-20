@@ -63,6 +63,7 @@ public class TestRuleText {
 	@Test
 	public void none() throws Exception {
 		Rule rule = new Rule();
+		Assert.assertEquals("None", ruleText.getDaysSummary(rule));
 		Assert.assertEquals("None", ruleText.getDays(rule));
 	}
 
@@ -70,6 +71,7 @@ public class TestRuleText {
 	public void monday() throws Exception {
 		Rule rule = new Rule();
 		rule.setCalendarDay(Calendar.MONDAY, true);
+		Assert.assertEquals("Mon", ruleText.getDaysSummary(rule));
 		Assert.assertEquals("Mon", ruleText.getDays(rule));
 	}
 
@@ -77,6 +79,7 @@ public class TestRuleText {
 	public void tuesday() throws Exception {
 		Rule rule = new Rule();
 		rule.setCalendarDay(Calendar.TUESDAY, true);
+		Assert.assertEquals("Tue", ruleText.getDaysSummary(rule));
 		Assert.assertEquals("Tue", ruleText.getDays(rule));
 	}
 
@@ -84,6 +87,7 @@ public class TestRuleText {
 	public void wednesday() throws Exception {
 		Rule rule = new Rule();
 		rule.setCalendarDay(Calendar.WEDNESDAY, true);
+		Assert.assertEquals("Wed", ruleText.getDaysSummary(rule));
 		Assert.assertEquals("Wed", ruleText.getDays(rule));
 	}
 
@@ -91,6 +95,7 @@ public class TestRuleText {
 	public void thursday() throws Exception {
 		Rule rule = new Rule();
 		rule.setCalendarDay(Calendar.THURSDAY, true);
+		Assert.assertEquals("Thu", ruleText.getDaysSummary(rule));
 		Assert.assertEquals("Thu", ruleText.getDays(rule));
 	}
 
@@ -98,6 +103,7 @@ public class TestRuleText {
 	public void friday() throws Exception {
 		Rule rule = new Rule();
 		rule.setCalendarDay(Calendar.FRIDAY, true);
+		Assert.assertEquals("Fri", ruleText.getDaysSummary(rule));
 		Assert.assertEquals("Fri", ruleText.getDays(rule));
 	}
 
@@ -105,6 +111,7 @@ public class TestRuleText {
 	public void saturday() throws Exception {
 		Rule rule = new Rule();
 		rule.setCalendarDay(Calendar.SATURDAY, true);
+		Assert.assertEquals("Sat", ruleText.getDaysSummary(rule));
 		Assert.assertEquals("Sat", ruleText.getDays(rule));
 	}
 
@@ -112,11 +119,145 @@ public class TestRuleText {
 	public void sunday() throws Exception {
 		Rule rule = new Rule();
 		rule.setCalendarDay(Calendar.SUNDAY, true);
+		Assert.assertEquals("Sun", ruleText.getDaysSummary(rule));
 		Assert.assertEquals("Sun", ruleText.getDays(rule));
 	}
 
 	@Test
-	public void all() throws Exception {
+	public void notMonday() throws Exception {
+		Rule rule = new Rule();
+		rule.setAllCalendarDays();
+		rule.setCalendarDay(Calendar.MONDAY, false);
+		Assert.assertEquals("Tue - Sun", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Tue, Wed, Thu, Fri, Sat, Sun", ruleText.getDays(rule));
+	}
+
+	@Test
+	public void notMondayOrWednesday() throws Exception {
+		Rule rule = new Rule();
+		rule.setAllCalendarDays();
+		rule.setCalendarDay(Calendar.MONDAY, false);
+		rule.setCalendarDay(Calendar.WEDNESDAY, false);
+		Assert.assertEquals("Tue, Thu - Sun", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Tue, Thu, Fri, Sat, Sun", ruleText.getDays(rule));
+	}
+
+	@Test
+	public void notTuesday() throws Exception {
+		Rule rule = new Rule();
+		rule.setAllCalendarDays();
+		rule.setCalendarDay(Calendar.TUESDAY, false);
+		Assert.assertEquals("Wed - Mon", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Wed, Thu, Fri, Sat, Sun", ruleText.getDays(rule));
+	}
+
+	@Test
+	public void notTuesdayOrThursday() throws Exception {
+		Rule rule = new Rule();
+		rule.setAllCalendarDays();
+		rule.setCalendarDay(Calendar.TUESDAY, false);
+		rule.setCalendarDay(Calendar.THURSDAY, false);
+		Assert.assertEquals("Fri - Mon, Wed", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Wed, Fri, Sat, Sun", ruleText.getDays(rule));
+	}
+
+	@Test
+	public void notWednesday() throws Exception {
+		Rule rule = new Rule();
+		rule.setAllCalendarDays();
+		rule.setCalendarDay(Calendar.WEDNESDAY, false);
+		Assert.assertEquals("Thu - Tue", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Tue, Thu, Fri, Sat, Sun", ruleText.getDays(rule));
+	}
+
+	@Test
+	public void notWednesdayOrFriday() throws Exception {
+		Rule rule = new Rule();
+		rule.setAllCalendarDays();
+		rule.setCalendarDay(Calendar.WEDNESDAY, false);
+		rule.setCalendarDay(Calendar.FRIDAY, false);
+		Assert.assertEquals("Sat - Tue, Thu", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Tue, Thu, Sat, Sun", ruleText.getDays(rule));
+	}
+
+	@Test
+	public void notThursday() throws Exception {
+		Rule rule = new Rule();
+		rule.setAllCalendarDays();
+		rule.setCalendarDay(Calendar.THURSDAY, false);
+		Assert.assertEquals("Fri - Wed", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Tue, Wed, Fri, Sat, Sun", ruleText.getDays(rule));
+	}
+
+	@Test
+	public void notThursdayOrSaturday() throws Exception {
+		Rule rule = new Rule();
+		rule.setAllCalendarDays();
+		rule.setCalendarDay(Calendar.THURSDAY, false);
+		rule.setCalendarDay(Calendar.SATURDAY, false);
+		Assert.assertEquals("Sun - Wed, Fri", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Tue, Wed, Fri, Sun", ruleText.getDays(rule));
+	}
+
+	@Test
+	public void notFriday() throws Exception {
+		Rule rule = new Rule();
+		rule.setAllCalendarDays();
+		rule.setCalendarDay(Calendar.FRIDAY, false);
+		Assert.assertEquals("Sat - Thu", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Tue, Wed, Thu, Sat, Sun", ruleText.getDays(rule));
+	}
+
+	@Test
+	public void notFridayOrSunday() throws Exception {
+		Rule rule = new Rule();
+		rule.setAllCalendarDays();
+		rule.setCalendarDay(Calendar.FRIDAY, false);
+		rule.setCalendarDay(Calendar.SUNDAY, false);
+		Assert.assertEquals("Mon - Thu, Sat", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Tue, Wed, Thu, Sat", ruleText.getDays(rule));
+	}
+
+	@Test
+	public void notSaturday() throws Exception {
+		Rule rule = new Rule();
+		rule.setAllCalendarDays();
+		rule.setCalendarDay(Calendar.SATURDAY, false);
+		Assert.assertEquals("Sun - Fri", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Tue, Wed, Thu, Fri, Sun", ruleText.getDays(rule));
+	}
+
+	@Test
+	public void notSaturdayOrMonday() throws Exception {
+		Rule rule = new Rule();
+		rule.setAllCalendarDays();
+		rule.setCalendarDay(Calendar.SATURDAY, false);
+		rule.setCalendarDay(Calendar.MONDAY, false);
+		Assert.assertEquals("Tue - Fri, Sun", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Tue, Wed, Thu, Fri, Sun", ruleText.getDays(rule));
+	}
+
+	@Test
+	public void notSunday() throws Exception {
+		Rule rule = new Rule();
+		rule.setAllCalendarDays();
+		rule.setCalendarDay(Calendar.SUNDAY, false);
+		Assert.assertEquals("Mon - Sat", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Tue, Wed, Thu, Fri, Sat", ruleText.getDays(rule));
+	}
+
+	@Test
+	public void notSundayOrTuesday() throws Exception {
+		Rule rule = new Rule();
+		rule.setAllCalendarDays();
+		rule.setCalendarDay(Calendar.SUNDAY, false);
+		rule.setCalendarDay(Calendar.TUESDAY, false);
+		Assert.assertEquals("Mon, Wed - Sat", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Wed, Thu, Fri, Sat", ruleText.getDays(rule));
+	}
+
+	@Test
+	public void all1() throws Exception {
 		Rule rule = new Rule();
 		rule.setCalendarDay(Calendar.MONDAY, true);
 		rule.setCalendarDay(Calendar.TUESDAY, true);
@@ -125,7 +266,16 @@ public class TestRuleText {
 		rule.setCalendarDay(Calendar.FRIDAY, true);
 		rule.setCalendarDay(Calendar.SATURDAY, true);
 		rule.setCalendarDay(Calendar.SUNDAY, true);
-		Assert.assertEquals("Every day", ruleText.getDays(rule));
+		Assert.assertEquals("Every day", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Tue, Wed, Thu, Fri, Sat, Sun", ruleText.getDays(rule));
+	}
+
+	@Test
+	public void all2() throws Exception {
+		Rule rule = new Rule();
+		rule.setAllCalendarDays();
+		Assert.assertEquals("Every day", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Tue, Wed, Thu, Fri, Sat, Sun", ruleText.getDays(rule));
 	}
 
 	@Test
@@ -136,7 +286,8 @@ public class TestRuleText {
 		rule.setCalendarDay(Calendar.WEDNESDAY, true);
 		rule.setCalendarDay(Calendar.THURSDAY, true);
 		rule.setCalendarDay(Calendar.FRIDAY, true);
-		Assert.assertEquals("Mon - Fri", ruleText.getDays(rule));
+		Assert.assertEquals("Mon - Fri", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Tue, Wed, Thu, Fri", ruleText.getDays(rule));
 	}
 
 	@Test
@@ -144,7 +295,8 @@ public class TestRuleText {
 		Rule rule = new Rule();
 		rule.setCalendarDay(Calendar.SATURDAY, true);
 		rule.setCalendarDay(Calendar.SUNDAY, true);
-		Assert.assertEquals("Sat - Sun", ruleText.getDays(rule));
+		Assert.assertEquals("Sat - Sun", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Sat, Sun", ruleText.getDays(rule));
 	}
 
 	@Test
@@ -154,6 +306,7 @@ public class TestRuleText {
 		rule.setCalendarDay(Calendar.WEDNESDAY, true);
 		rule.setCalendarDay(Calendar.FRIDAY, true);
 		rule.setCalendarDay(Calendar.SUNDAY, true);
+		Assert.assertEquals("Sun - Mon, Wed, Fri", ruleText.getDaysSummary(rule));
 		Assert.assertEquals("Mon, Wed, Fri, Sun", ruleText.getDays(rule));
 	}
 
@@ -163,6 +316,7 @@ public class TestRuleText {
 		rule.setCalendarDay(Calendar.TUESDAY, true);
 		rule.setCalendarDay(Calendar.THURSDAY, true);
 		rule.setCalendarDay(Calendar.SATURDAY, true);
+		Assert.assertEquals("Tue, Thu, Sat", ruleText.getDaysSummary(rule));
 		Assert.assertEquals("Tue, Thu, Sat", ruleText.getDays(rule));
 	}
 
@@ -174,7 +328,8 @@ public class TestRuleText {
 		rule.setCalendarDay(Calendar.THURSDAY, true);
 		rule.setCalendarDay(Calendar.FRIDAY, true);
 		rule.setCalendarDay(Calendar.SUNDAY, true);
-		Assert.assertEquals("Mon - Tue, Thu - Fri, Sun", ruleText.getDays(rule));
+		Assert.assertEquals("Sun - Tue, Thu - Fri", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Tue, Thu, Fri, Sun", ruleText.getDays(rule));
 	}
 
 	@Test
@@ -185,7 +340,8 @@ public class TestRuleText {
 		rule.setCalendarDay(Calendar.THURSDAY, true);
 		rule.setCalendarDay(Calendar.SATURDAY, true);
 		rule.setCalendarDay(Calendar.SUNDAY, true);
-		Assert.assertEquals("Mon, Wed - Thu, Sat - Sun", ruleText.getDays(rule));
+		Assert.assertEquals("Sat - Mon, Wed - Thu", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Wed, Thu, Sat, Sun", ruleText.getDays(rule));
 	}
 
 	@Test
@@ -197,7 +353,8 @@ public class TestRuleText {
 		rule.setCalendarDay(Calendar.FRIDAY, true);
 		rule.setCalendarDay(Calendar.SATURDAY, true);
 		rule.setCalendarDay(Calendar.SUNDAY, true);
-		Assert.assertEquals("Mon - Wed, Fri - Sun", ruleText.getDays(rule));
+		Assert.assertEquals("Fri - Wed", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Tue, Wed, Fri, Sat, Sun", ruleText.getDays(rule));
 	}
 
 	@Test
@@ -208,6 +365,7 @@ public class TestRuleText {
 		rule.setCalendarDay(Calendar.THURSDAY, true);
 		rule.setCalendarDay(Calendar.FRIDAY, true);
 		rule.setCalendarDay(Calendar.SUNDAY, true);
-		Assert.assertEquals("Mon, Wed - Fri, Sun", ruleText.getDays(rule));
+		Assert.assertEquals("Sun - Mon, Wed - Fri", ruleText.getDaysSummary(rule));
+		Assert.assertEquals("Mon, Wed, Thu, Fri, Sun", ruleText.getDays(rule));
 	}
 }
