@@ -20,7 +20,6 @@ package uk.me.sa.android.do_not_disturb.ui;
 
 import java.util.List;
 
-import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
@@ -45,11 +44,6 @@ public class RuleListAdapter extends BaseAdapter {
 
 	@Bean
 	RulesDAO db;
-
-	@AfterInject
-	void initAdapter() {
-		loadRules();
-	}
 
 	@Background
 	void loadRules() {

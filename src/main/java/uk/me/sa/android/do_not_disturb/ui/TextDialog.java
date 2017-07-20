@@ -58,17 +58,11 @@ public abstract class TextDialog {
 
 		alertDialog = new AlertDialog.Builder(context).setView(layout).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
-				new AsyncTask<String, Void, Boolean>() {
+				new AsyncTask<String, Void, Void>() {
 					@Override
-					protected Boolean doInBackground(String... params) {
-						return saveText(params[0]);
-					}
-
-					@Override
-					protected void onPostExecute(Boolean result) {
-						if (result) {
-							onSuccess();
-						}
+					protected Void doInBackground(String... params) {
+						saveText(params[0]);
+						return null;
 					}
 				}.execute(editText.getText().toString());
 			}
@@ -145,10 +139,5 @@ public abstract class TextDialog {
 	 * 
 	 * @return true if the text is valid and has been saved
 	 */
-	abstract boolean saveText(String value);
-
-	/**
-	 * Executed on the UI thread if the text has been saved
-	 */
-	abstract void onSuccess();
+	abstract void saveText(String value);
 }

@@ -48,10 +48,13 @@
 
 	<string name="add_rule">Add rule</string>
 	<string name="enter_rule_name">Enter rule name</string>
-	<string name="rule_name_empty"></string>
+	<string name="new_rule_name_empty"></string>
+	<string name="rule_name_empty">Rule name cannot be empty</string>
 	<string name="rule_name_in_use">Rule name already in use</string>
 	<string name="error_adding_rule">Error creating rule: %1$s</string>
 	<string name="error_updating_rule">Error updating rule: %1$s</string>
+	<string name="delete_rule">Delete rule</string>
+	<string name="confirm_delete_rule">Delete "%1$s" rule?</string>
 
 	<string name="on">On</string>
 	<string name="off">Off</string>

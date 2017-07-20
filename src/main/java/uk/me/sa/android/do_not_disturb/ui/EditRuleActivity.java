@@ -23,25 +23,30 @@ import java.util.Set;
 
 import org.androidannotations.annotations.AfterExtras;
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
-import org.androidannotations.annotations.SupposeBackground;
-import org.androidannotations.annotations.SupposeUiThread;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.Receiver;
+import org.androidannotations.annotations.Receiver.RegisterAt;
+import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.UiThread.Propagation;
 import org.androidannotations.annotations.ViewById;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
-import com.google.common.primitives.Booleans;
-
+import uk.me.sa.android.do_not_disturb.R;
+import uk.me.sa.android.do_not_disturb.data.Rule;
+import uk.me.sa.android.do_not_disturb.data.RulesDAO;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -49,20 +54,18 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
-import uk.me.sa.android.do_not_disturb.R;
-import uk.me.sa.android.do_not_disturb.data.Rule;
-import uk.me.sa.android.do_not_disturb.data.RulesDAO;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.primitives.Booleans;
 
 @EActivity(R.layout.edit_rule)
+@OptionsMenu(R.menu.edit_rule_actions)
 public class EditRuleActivity extends Activity {
 	private static final Logger log = LoggerFactory.getLogger(EditRuleActivity.class);
 
 	public static final String ACTION_EDIT = EditRuleActivity.class.getName() + ".EDIT";
 	public static final String EXTRA_RULE_ID = "RULE_ID";
-
-	interface UpdateRule {
-		public void apply(Rule rule);
-	}
 
 	@Bean
 	RuleText ruleText;
@@ -91,7 +94,7 @@ public class EditRuleActivity extends Activity {
 	@Extra(value = EXTRA_RULE_ID)
 	Long id;
 
-	Rule rule;
+	volatile Rule rule;
 
 	@Override
 	protected void onNewIntent(Intent intent) {
@@ -103,71 +106,101 @@ public class EditRuleActivity extends Activity {
 	void onEdit() {
 		log.debug("Edit {}", id);
 
-		if (id == null) {
+		if (id != null) {
+			loadRule();
+		} else {
 			log.error("Missing rule id");
 			finish();
-			return;
 		}
+	}
 
-		synchronized (this) {
-			rule = db.getRule(id);
-			if (rule == null) {
-				log.error("Rule {} does not exist", id);
-				finish();
-				return;
-			}
+	@Background
+	void loadRule() {
+		Rule load = db.getRule(id);
+
+		if (load != null) {
+			rule = load;
+			showRule();
+		} else {
+			log.error("Rule {} does not exist", id);
+			runOnUiThread(new Runnable() {
+				public void run() {
+					finish();
+				}
+			});
 		}
 	}
 
 	@AfterViews
-	@SupposeUiThread
+	@UiThread(propagation = Propagation.REUSE)
 	void showRule() {
 		log.debug("Show {}", rule);
 
-		getActionBar().setTitle(rule.getName());
-		enabled.setText(getResources().getString(rule.isEnabled() ? R.string.on : R.string.off));
-		enabled.setChecked(rule.isEnabled());
-		name.setText(rule.getName());
-		days.setText(ruleText.getDays(rule));
-		start.setText(ruleText.getStartTime(rule));
-		end.setText(ruleText.getEndTime(rule));
-		level.setText(ruleText.getLevel(rule));
+		if (rule != null) {
+			getActionBar().setTitle(rule.getName());
+			enabled.setText(getResources().getString(rule.isEnabled() ? R.string.on : R.string.off));
+			enabled.setChecked(rule.isEnabled());
+			name.setText(rule.getName());
+			days.setText(ruleText.getDays(rule));
+			start.setText(ruleText.getStartTime(rule));
+			end.setText(ruleText.getEndTime(rule));
+			level.setText(ruleText.getLevel(rule));
+		}
+	}
+
+	@Receiver(registerAt = RegisterAt.OnStartOnStop, local = true, actions = RulesDAO.BROADCAST_UPDATE)
+	void onDatabaseUpdate(@Receiver.Extra(RulesDAO.EXTRA_RULE_ID) Long id) {
+		if (id == rule.getId()) {
+			log.info("Update {}", rule);
+			loadRule();
+		}
+	}
+
+	@Receiver(registerAt = RegisterAt.OnStartOnStop, local = true, actions = RulesDAO.BROADCAST_DELETE)
+	void onDatabaseDelete(@Receiver.Extra(RulesDAO.EXTRA_RULE_ID) Long id) {
+		if (id == rule.getId()) {
+			log.info("Delete {}", rule);
+			finish();
+		}
+	}
+
+	@Click(R.id.enabled)
+	void toggleEnabled() {
+		toggleEnabled(enabled.isChecked());
+	}
+
+	@Background(serial = "enabled")
+	void toggleEnabled(boolean value) {
+		Rule save = rule.clone();
+		save.setEnabled(value);
+		savedRule(db.updateRuleEnabled(save));
 	}
 
 	@Click(R.id.name_row)
-	synchronized void editName() {
+	void editName() {
 		new TextDialog(this, R.string.rule_name, rule.getName(), R.string.enter_rule_name) {
 			@Override
 			Integer checkText(String value) {
-				synchronized (this) {
-					return rule.isNameValid(db, value);
-				}
+				return rule.isNameValid(db, value);
 			}
 
 			@Override
-			boolean saveText(final String value) {
-				synchronized (this) {
-					Integer error = rule.isNameValid(db, value);
-					if (error == null) {
-						rule.setName(value);
-						return saveRule();
-					} else {
-						Toast.makeText(EditRuleActivity.this, getResources().getString(R.string.error_updating_rule, getResources().getString(error)),
-								Toast.LENGTH_SHORT).show();
-						return false;
-					}
+			void saveText(final String value) {
+				Integer error = rule.isNameValid(db, value);
+				if (error == null) {
+					Rule save = rule.clone();
+					save.setName(value);
+					savedRule(db.updateRuleName(save));
+				} else {
+					Toast.makeText(EditRuleActivity.this, getResources().getString(R.string.error_updating_rule, getResources().getString(error)),
+							Toast.LENGTH_SHORT).show();
 				}
-			}
-
-			@Override
-			void onSuccess() {
-				showRule();
 			}
 		};
 	}
 
 	@Click(R.id.days_row)
-	synchronized void editDays() {
+	void editDays() {
 		Map<String, Integer> weekdays = ruleText.getLongWeekdays();
 		final Integer[] orderedWeekdays = weekdays.values().toArray(new Integer[weekdays.size()]);
 		final Set<Integer> ruleDays = rule.getCalendarDays();
@@ -182,20 +215,13 @@ public class EditRuleActivity extends Activity {
 				.setMultiChoiceItems(weekdays.keySet().toArray(new String[weekdays.size()]), checkedDays, new OnMultiChoiceClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, final int which, final boolean isChecked) {
-						new AsyncTask<Void, Void, Boolean>() {
+						new AsyncTask<Void, Void, Void>() {
 							@Override
-							protected Boolean doInBackground(Void... params) {
-								synchronized (this) {
-									rule.setCalendarDay(orderedWeekdays[which], isChecked);
-									return saveRule();
-								}
-							}
-
-							@Override
-							protected void onPostExecute(Boolean result) {
-								if (result) {
-									showRule();
-								}
+							protected Void doInBackground(Void... params) {
+								Rule save = rule.clone();
+								save.setCalendarDay(orderedWeekdays[which], isChecked);
+								savedRule(db.updateRuleDays(save));
+								return null;
 							}
 						}.execute();
 					}
@@ -203,66 +229,68 @@ public class EditRuleActivity extends Activity {
 	}
 
 	@Click(R.id.start_time_row)
-	synchronized void editStartTime() {
+	void editStartTime() {
+		Rule edit = rule.clone();
 		new TimePickerDialog(this, new OnTimeSetListener() {
 			@Override
 			public void onTimeSet(TimePicker view, final int hourOfDay, final int minute) {
-				new AsyncTask<Void, Void, Boolean>() {
+				new AsyncTask<Void, Void, Void>() {
 					@Override
-					protected Boolean doInBackground(Void... params) {
-						synchronized (this) {
-							rule.setStartHour(hourOfDay);
-							rule.setStartMinute(minute);
-							return saveRule();
-						}
-					}
-
-					@Override
-					protected void onPostExecute(Boolean result) {
-						if (result) {
-							showRule();
-						}
+					protected Void doInBackground(Void... params) {
+						Rule save = rule.clone();
+						save.setStartHour(hourOfDay);
+						save.setStartMinute(minute);
+						savedRule(db.updateRuleStartTime(save));
+						return null;
 					}
 				}.execute();
 			}
-		}, rule.getStartHour(), rule.getStartMinute(), true).show();
+		}, edit.getStartHour(), edit.getStartMinute(), true).show();
 	}
 
 	@Click(R.id.end_time_row)
-	synchronized void editEndTime() {
+	void editEndTime() {
+		Rule edit = rule.clone();
 		new TimePickerDialog(this, new OnTimeSetListener() {
 			@Override
 			public void onTimeSet(TimePicker view, final int hourOfDay, final int minute) {
-				new AsyncTask<Void, Void, Boolean>() {
+				new AsyncTask<Void, Void, Void>() {
 					@Override
-					protected Boolean doInBackground(Void... params) {
-						synchronized (this) {
-							rule.setEndHour(hourOfDay);
-							rule.setEndMinute(minute);
-							return saveRule();
-						}
-					}
-
-					@Override
-					protected void onPostExecute(Boolean result) {
-						if (result) {
-							showRule();
-						}
+					protected Void doInBackground(Void... params) {
+						Rule save = rule.clone();
+						save.setEndHour(hourOfDay);
+						save.setEndMinute(minute);
+						savedRule(db.updateRuleEndTime(save));
+						return null;
 					}
 				}.execute();
 			}
-		}, rule.getEndHour(), rule.getEndMinute(), true).show();
+		}, edit.getEndHour(), edit.getEndMinute(), true).show();
 	}
 
-	@SupposeBackground
-	boolean saveRule() {
-		if (db.updateRule(rule)) {
-			rule = db.getRule(rule.getId());
-			return true;
-		} else {
+	void savedRule(boolean success) {
+		if (!success) {
 			Toast.makeText(this, getResources().getString(R.string.error_updating_rule, getResources().getString(R.string.database_write_failed)),
 					Toast.LENGTH_SHORT).show();
-			return false;
+		}
+	}
+
+	@OptionsItem(R.id.delete_rule)
+	void deleteRule() {
+		if (rule != null) {
+			new AlertDialog.Builder(this).setMessage(getResources().getString(R.string.confirm_delete_rule, rule.getName()))
+					.setPositiveButton(R.string.delete_rule, new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							new AsyncTask<Void, Void, Void>() {
+								@Override
+								protected Void doInBackground(Void... params) {
+									savedRule(db.deleteRule(rule));
+									return null;
+								}
+							}.execute();
+						}
+					}).setNegativeButton(android.R.string.cancel, null).create().show();
 		}
 	}
 }

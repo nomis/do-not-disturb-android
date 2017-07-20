@@ -50,9 +50,9 @@ public class Rule implements Comparable<Rule>, Cloneable {
 		CALENDAR_BITMAP_TO_DAYS = CALENDAR_DAYS_TO_BITMAP.inverse();
 	}
 
-	private long id = 0;
-	private boolean enabled = true;
-	private boolean temporarilyDisabled = false;
+	private long id;
+	private boolean enabled;
+	private boolean temporarilyDisabled;
 
 	private String name;
 	private int days;
@@ -154,6 +154,10 @@ public class Rule implements Comparable<Rule>, Cloneable {
 		} else {
 			days &= ~CALENDAR_DAYS_TO_BITMAP.get(calendarDay);
 		}
+	}
+
+	public void setAllCalendarDays() {
+		setCalendarDays(CALENDAR_DAYS_TO_BITMAP.keySet());
 	}
 
 	public int getStartHour() {

@@ -20,19 +20,19 @@ package uk.me.sa.android.do_not_disturb.data;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.Set;
 import java.util.TimeZone;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableSet;
+
 public class TestRule {
 	@Test
 	public void isActiveSameDay() {
 		Rule rule = new Rule();
-		Set<Integer> days = rule.getCalendarDays();
-		days.add(Calendar.SUNDAY);
-		rule.setCalendarDays(days);
+		rule.setEnabled(true);
+		rule.setCalendarDays(ImmutableSet.of(Calendar.SUNDAY));
 		rule.setStartHour(15);
 		rule.setEndHour(23);
 

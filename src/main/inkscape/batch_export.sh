@@ -14,7 +14,7 @@
 # ACTION BAR     32    48      64       96      128
 # NOTIFICATION   24    36      48       72       96
 
-ICONS="ic_event_do_not_disturb ic_access_time ic_add"
+ICONS="ic_event_do_not_disturb ic_access_time ic_add ic_delete"
 NOTIFICATIONS="ic_do_not_disturb_on ic_do_not_disturb_off"
 
 function render {

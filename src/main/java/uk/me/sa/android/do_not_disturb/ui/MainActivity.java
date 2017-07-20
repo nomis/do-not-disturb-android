@@ -24,9 +24,14 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.Receiver;
+import org.androidannotations.annotations.Receiver.RegisterAt;
 import org.androidannotations.annotations.ViewById;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.me.sa.android.do_not_disturb.R;
+import uk.me.sa.android.do_not_disturb.data.InterruptionFilter;
 import uk.me.sa.android.do_not_disturb.data.Rule;
 import uk.me.sa.android.do_not_disturb.data.RulesDAO;
 import android.app.Activity;
@@ -38,6 +43,8 @@ import android.widget.Toast;
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.main_activity_actions)
 public class MainActivity extends Activity {
+	private static final Logger log = LoggerFactory.getLogger(EditRuleActivity.class);
+
 	@ViewById
 	ListView rules;
 
@@ -50,6 +57,29 @@ public class MainActivity extends Activity {
 	@AfterViews
 	void bindAdapter() {
 		rules.setAdapter(adapter);
+	}
+
+	public void onStart() {
+		super.onStart();
+		adapter.loadRules();
+	}
+
+	@Receiver(registerAt = RegisterAt.OnStartOnStop, local = true, actions = RulesDAO.BROADCAST_INSERT)
+	void onDatabaseInsert(@Receiver.Extra(RulesDAO.EXTRA_RULE_ID) Long id) {
+		log.info("Insert {}", id);
+		adapter.loadRules();
+	}
+
+	@Receiver(registerAt = RegisterAt.OnStartOnStop, local = true, actions = RulesDAO.BROADCAST_UPDATE)
+	void onDatabaseUpdate(@Receiver.Extra(RulesDAO.EXTRA_RULE_ID) Long id) {
+		log.info("Update {}", id);
+		adapter.loadRules();
+	}
+
+	@Receiver(registerAt = RegisterAt.OnStartOnStop, local = true, actions = RulesDAO.BROADCAST_DELETE)
+	void onDatabaseDelete(@Receiver.Extra(RulesDAO.EXTRA_RULE_ID) Long id) {
+		log.info("Delete {}", id);
+		adapter.loadRules();
 	}
 
 	@ItemClick(R.id.rules)
@@ -71,39 +101,39 @@ public class MainActivity extends Activity {
 		new TextDialog(this, R.string.add_rule, null, R.string.enter_rule_name) {
 			@Override
 			Integer checkText(String value) {
-				synchronized (this) {
-					return new Rule().isNameValid(db, value);
+				Integer error = new Rule().isNameValid(db, value);
+				if (error != null && error == R.string.rule_name_empty) {
+					return R.string.new_rule_name_empty;
 				}
+				return error;
 			}
 
 			@Override
-			boolean saveText(final String value) {
+			void saveText(final String value) {
 				Integer error = new Rule().isNameValid(db, value);
 				if (error == null) {
-					return addRule(value);
+					addRule(value);
 				} else {
 					Toast.makeText(MainActivity.this, getResources().getString(R.string.error_adding_rule, getResources().getString(error)), Toast.LENGTH_SHORT)
 							.show();
-					return false;
 				}
-			}
-
-			@Override
-			void onSuccess() {
-				adapter.loadRules(); // TODO use broadcast
 			}
 		};
 	}
 
-	boolean addRule(String name) {
+	void addRule(String name) {
 		Rule rule = new Rule();
 
 		rule.setName(name);
+		rule.setAllCalendarDays();
+		rule.setStartHour(22);
+		rule.setEndHour(7);
+		rule.setLevel(InterruptionFilter.PRIORITY);
+
 		if (db.addRule(rule)) {
-			return true;
+			editRule(rule);
 		} else {
 			Toast.makeText(this, R.string.error_adding_rule, Toast.LENGTH_SHORT).show();
-			return false;
 		}
 	}
 
