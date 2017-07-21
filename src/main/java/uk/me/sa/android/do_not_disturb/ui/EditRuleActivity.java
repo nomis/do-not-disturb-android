@@ -74,6 +74,9 @@ public class EditRuleActivity extends Activity {
 	RuleText ruleText;
 
 	@ViewById
+	View edit_rule;
+
+	@ViewById
 	Switch enabled;
 
 	@ViewById
@@ -173,6 +176,8 @@ public class EditRuleActivity extends Activity {
 			start_time_row.setEnabled(hasDays);
 			end_time_row.setEnabled(hasDays);
 			level_row.setEnabled(hasDays);
+
+			edit_rule.jumpDrawablesToCurrentState();
 		}
 	}
 
