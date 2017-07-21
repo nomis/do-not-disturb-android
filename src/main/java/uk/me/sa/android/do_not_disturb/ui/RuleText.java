@@ -202,4 +202,8 @@ public class RuleText {
 			return context.getResources().getString(R.string.off);
 		}
 	}
+
+	public String getNotification(Rule rule) {
+		return context.getResources().getString(rule.getLevel().getDescription());
+	}
 }

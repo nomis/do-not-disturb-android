@@ -16,7 +16,7 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package uk.me.sa.android.do_not_disturb;
+package uk.me.sa.android.do_not_disturb.service;
 
 import org.junit.After;
 import org.junit.Before;
@@ -43,12 +43,13 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(emulateSdk = 18)
-@PrepareForTest(fullyQualifiedNames = { "uk.me.sa.android.do_not_disturb.NotificationListener", "uk.me.sa.android.do_not_disturb.NotificationListener_" })
+@PrepareForTest(fullyQualifiedNames = { "uk.me.sa.android.do_not_disturb.service.InterruptionFilterListener",
+		"uk.me.sa.android.do_not_disturb.service.InterruptionFilterListener_" })
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*" })
-public class TestNotificationListener {
+public class TestInterruptionFilterListener {
 	SharedPreferences sharedPreferences;
-	ServiceController<NotificationListener_> controller;
-	NotificationListener_ service;
+	ServiceController<InterruptionFilterListener> controller;
+	InterruptionFilterListener service;
 
 	@SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
 	@Rule
@@ -63,7 +64,7 @@ public class TestNotificationListener {
 		ShadowToast.reset();
 		ShadowPowerManager.reset();
 		sharedPreferences = ShadowPreferenceManager.getDefaultSharedPreferences(Robolectric.application.getApplicationContext());
-		controller = Robolectric.buildService(NotificationListener_.class);
+		controller = Robolectric.buildService(InterruptionFilterListener.class);
 		service = PowerMockito.spy(controller.create().bind().get());
 	}
 

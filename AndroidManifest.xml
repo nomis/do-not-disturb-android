@@ -26,6 +26,14 @@
 		android:minSdkVersion="25"
 		android:targetSdkVersion="25"/>
 
+	<permission
+		android:name="uk.me.sa.android.do_not_disturb.INTERNAL_ACTION"
+		android:protectionLevel="signature"/>
+
+	<uses-permission android:name="android.permission.WAKE_LOCK"/>
+	<uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
+	<uses-permission android:name="uk.me.sa.android.do_not_disturb.INTERNAL_ACTION"/>
+
 	<application
 		android:allowBackup="true"
 		android:icon="@drawable/ic_event_do_not_disturb"
@@ -34,13 +42,17 @@
 		android:supportsRtl="true">
 		
 		<service
-			android:name=".NotificationListener_"
+			android:name=".service.DoNotDisturb_"
+			android:label="@string/app_name"
+			android:permission="uk.me.sa.android.do_not_disturb.INTERNAL_ACTION">
+		</service>
+
+		<service
+			android:name=".service.InterruptionFilterListener"
 			android:label="@string/app_name"
 			android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
 			<intent-filter>
 				<action android:name="android.service.notification.NotificationListenerService"/>
-				<action android:name="uk.me.sa.android.do_not_disturb.NotificationListener.ENABLE"/>
-				<action android:name="uk.me.sa.android.do_not_disturb.NotificationListener.DISABLE"/>
 			</intent-filter>
 		</service>
 		
@@ -55,10 +67,8 @@
 		</activity>
 
 		<activity
-			android:name=".ui.EditRuleActivity_">
-			<intent-filter>
-				<action android:name="uk.me.sa.android.do_not_disturb.ui.EditRuleActivity.EDIT"/>
-			</intent-filter>
+			android:name=".ui.EditRuleActivity_"
+			android:permission="uk.me.sa.android.do_not_disturb.INTERNAL_ACTION">
 		</activity>
 	</application>
 </manifest>

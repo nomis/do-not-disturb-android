@@ -24,13 +24,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.androidannotations.annotations.AfterInject;
+import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.RootContext;
+import org.androidannotations.annotations.SystemService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.me.sa.android.do_not_disturb.NotificationListener;
-import uk.me.sa.android.do_not_disturb.NotificationListener_;
-import uk.me.sa.android.do_not_disturb.R;
-import uk.me.sa.android.do_not_disturb.data.Rule;
+import com.google.common.base.Objects;
+
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -38,70 +41,74 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
+import uk.me.sa.android.do_not_disturb.R;
+import uk.me.sa.android.do_not_disturb.data.Rule;
+import uk.me.sa.android.do_not_disturb.service.DoNotDisturb_;
 
-import com.google.common.base.Objects;
-
-public final class ActiveRuleNotification {
+@EBean
+public class ActiveRuleNotification {
 	private static final Logger log = LoggerFactory.getLogger(ActiveRuleNotification.class);
 
-	private Context context;
-	private NotificationManager notificationManager;
-	@SuppressLint("UseSparseArrays")
-	private Map<Long, Rule> rules = new HashMap<Long, Rule>();
+	@RootContext
+	Context context;
 
-	public ActiveRuleNotification(Context context) {
-		this.context = context;
-		notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+	@SystemService
+	NotificationManager notificationManager;
+
+	@Bean
+	RuleText ruleText;
+
+	@SuppressLint("UseSparseArrays")
+	Map<Long, Rule> rules = new HashMap<Long, Rule>();
+
+	@AfterInject
+	public void onStart() {
+		log.debug("Clearing all notifications");
 		notificationManager.cancelAll();
 	}
 
 	public synchronized void setActiveRules(Set<Rule> newRules) {
 		Set<Long> newRuleIds = new HashSet<Long>();
 
-		for (Rule newRule : newRules) {
-			newRuleIds.add(newRule.getId());
+		for (Rule rule : newRules) {
+			newRuleIds.add(rule.getId());
 
-			if (Objects.equal(rules.get(newRule.getId()), newRule)) {
+			if (Objects.equal(rules.get(rule.getId()), rule)) {
 				continue;
 			}
 
-			log.info("Adding notification for {}", newRule);
-			NotificationCompat.Builder builder = new NotificationCompat.Builder(context).setContentTitle(newRule.getName())
-					.setContentText(newRule.getLevel().toString()).setOngoing(true).setPriority(Notification.PRIORITY_HIGH);
+			log.debug("Adding notification for {}", rule);
+			NotificationCompat.Builder builder = new NotificationCompat.Builder(context).setContentTitle(rule.getName())
+					.setContentText(ruleText.getNotification(rule)).setOngoing(true).setPriority(Notification.PRIORITY_HIGH).setWhen(0);
 
-			Intent editIntent = new Intent(EditRuleActivity.ACTION_EDIT, null, context, EditRuleActivity_.class);
-			editIntent.putExtra(EditRuleActivity.EXTRA_RULE_ID, newRule.getId());
 			builder.addAction(android.R.drawable.ic_menu_edit, context.getString(R.string.notification_edit),
-					PendingIntent.getService(context, 0, editIntent, 0));
+					PendingIntent.getActivity(context, (int)rule.getId(),
+							EditRuleActivity_.intent(context).ruleId(rule.getId())
+									.flags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP).get(),
+							PendingIntent.FLAG_UPDATE_CURRENT));
 
-			if (newRule.isTemporarilyDisabled()) {
-				Intent enableIntent = new Intent(NotificationListener.ACTION_TEMPORARY_ENABLE, null, context, NotificationListener_.class);
-				enableIntent.putExtra(EditRuleActivity.EXTRA_RULE_ID, newRule.getId());
-
+			if (rule.isTemporarilyDisabled()) {
 				builder.setSmallIcon(R.drawable.ic_do_not_disturb_off);
-				builder.addAction(android.R.drawable.button_onoff_indicator_off, context.getString(R.string.notification_enable),
-						PendingIntent.getService(context, 0, enableIntent, 0));
+				builder.addAction(android.R.drawable.button_onoff_indicator_off, context.getString(R.string.notification_enable), PendingIntent.getService(
+						context, (int)rule.getId(), DoNotDisturb_.intent(context).enableRule(rule.getId()).get(), PendingIntent.FLAG_UPDATE_CURRENT));
 			} else {
-				Intent disableIntent = new Intent(NotificationListener.ACTION_TEMPORARY_DISABLE, null, context, NotificationListener_.class);
-				disableIntent.putExtra(EditRuleActivity.EXTRA_RULE_ID, newRule.getId());
-
 				builder.setSmallIcon(R.drawable.ic_do_not_disturb_on);
-				builder.addAction(android.R.drawable.button_onoff_indicator_on, context.getString(R.string.notification_disable),
-						PendingIntent.getService(context, 0, disableIntent, 0));
+				builder.addAction(android.R.drawable.button_onoff_indicator_on, context.getString(R.string.notification_disable), PendingIntent.getService(
+						context, (int)rule.getId(), DoNotDisturb_.intent(context).disableRule(rule.getId()).get(), PendingIntent.FLAG_UPDATE_CURRENT));
 			}
 
 			Notification notification = builder.build();
 			notification.visibility = Notification.VISIBILITY_PUBLIC;
-			notificationManager.notify((int)newRule.getId(), notification);
+			notificationManager.notify((int)rule.getId(), notification);
 
-			rules.put(newRule.getId(), newRule.clone());
+			rules.put(rule.getId(), rule.clone());
 		}
 
 		for (Iterator<Long> it = rules.keySet().iterator(); it.hasNext();) {
 			Long id = it.next();
 
 			if (!newRuleIds.contains(id)) {
-				log.info("Removing notification for {}", rules.get(id));
+				log.debug("Removing notification for {}", rules.get(id));
 				notificationManager.cancel(id.intValue());
 
 				it.remove();

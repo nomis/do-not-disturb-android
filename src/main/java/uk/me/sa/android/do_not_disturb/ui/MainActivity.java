@@ -30,15 +30,15 @@ import org.androidannotations.annotations.ViewById;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.me.sa.android.do_not_disturb.R;
-import uk.me.sa.android.do_not_disturb.data.InterruptionFilter;
-import uk.me.sa.android.do_not_disturb.data.Rule;
-import uk.me.sa.android.do_not_disturb.data.RulesDAO;
 import android.app.Activity;
 import android.content.Intent;
 import android.provider.Settings;
 import android.widget.ListView;
 import android.widget.Toast;
+import uk.me.sa.android.do_not_disturb.R;
+import uk.me.sa.android.do_not_disturb.data.InterruptionFilter;
+import uk.me.sa.android.do_not_disturb.data.Rule;
+import uk.me.sa.android.do_not_disturb.data.RulesDAO;
 
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.main_activity_actions)
@@ -92,9 +92,7 @@ public class MainActivity extends Activity {
 	}
 
 	void editRule(Rule rule) {
-		Intent intent = new Intent(EditRuleActivity.ACTION_EDIT, null, this, EditRuleActivity_.class);
-		intent.putExtra(EditRuleActivity.EXTRA_RULE_ID, rule.getId());
-		startActivity(intent);
+		EditRuleActivity_.intent(this).ruleId(rule.getId()).start();
 	}
 
 	void addRule() {

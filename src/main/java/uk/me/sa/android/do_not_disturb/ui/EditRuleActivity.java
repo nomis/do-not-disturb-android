@@ -70,9 +70,6 @@ import uk.me.sa.android.do_not_disturb.data.RulesDAO;
 public class EditRuleActivity extends Activity {
 	private static final Logger log = LoggerFactory.getLogger(EditRuleActivity.class);
 
-	public static final String ACTION_EDIT = EditRuleActivity.class.getName() + ".EDIT";
-	public static final String EXTRA_RULE_ID = "RULE_ID";
-
 	@Bean
 	RuleText ruleText;
 
@@ -106,8 +103,8 @@ public class EditRuleActivity extends Activity {
 	@Bean
 	RulesDAO db;
 
-	@Extra(value = EXTRA_RULE_ID)
-	Long id;
+	@Extra
+	Long ruleId;
 
 	volatile Rule rule;
 
@@ -125,11 +122,9 @@ public class EditRuleActivity extends Activity {
 
 	@AfterExtras
 	void onEdit() {
-		log.debug("Edit {}", id);
+		log.debug("Edit {}", ruleId);
 
-		if (id != null) {
-			loadRule();
-		} else {
+		if (ruleId == null) {
 			log.error("Missing rule id");
 			finish();
 		}
@@ -137,13 +132,13 @@ public class EditRuleActivity extends Activity {
 
 	@Background
 	void loadRule() {
-		Rule load = db.getRule(id);
+		Rule load = db.getRule(ruleId);
 
 		if (load != null) {
 			rule = load;
 			showRule();
 		} else {
-			log.error("Rule {} does not exist", id);
+			log.error("Rule {} does not exist", ruleId);
 			runOnUiThread(new Runnable() {
 				public void run() {
 					finish();
@@ -184,7 +179,7 @@ public class EditRuleActivity extends Activity {
 	@Receiver(registerAt = RegisterAt.OnStartOnStop, local = true, actions = RulesDAO.BROADCAST_UPDATE)
 	void onDatabaseUpdate(@Receiver.Extra(RulesDAO.EXTRA_RULE_ID) Long id) {
 		if (id == rule.getId()) {
-			log.info("Update {}", rule);
+			log.debug("Update {}", rule);
 			loadRule();
 		}
 	}
@@ -192,7 +187,7 @@ public class EditRuleActivity extends Activity {
 	@Receiver(registerAt = RegisterAt.OnStartOnStop, local = true, actions = RulesDAO.BROADCAST_DELETE)
 	void onDatabaseDelete(@Receiver.Extra(RulesDAO.EXTRA_RULE_ID) Long id) {
 		if (id == rule.getId()) {
-			log.info("Delete {}", rule);
+			log.debug("Delete {}", rule);
 			finish();
 		}
 	}

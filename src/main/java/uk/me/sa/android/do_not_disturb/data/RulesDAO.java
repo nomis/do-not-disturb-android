@@ -27,6 +27,9 @@ import org.androidannotations.annotations.EBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -34,9 +37,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v4.content.LocalBroadcastManager;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
 
 @EBean
 public class RulesDAO extends SQLiteOpenHelper {
@@ -66,8 +66,8 @@ public class RulesDAO extends SQLiteOpenHelper {
 			+ RULES_COLUMN_ENABLED + " INTEGER NOT NULL, " + RULES_COLUMN_TEMPORARILY_DISABLED + " INTEGER NOT NULL, " + RULES_COLUMN_NAME + " TEXT NOT NULL, "
 			+ RULES_COLUMN_DAYS + " INTEGER NOT NULL, " + RULES_COLUMN_START_HOUR + " INTEGER NOT NULL, " + RULES_COLUMN_START_MINUTE + " INTEGER NOT NULL, "
 			+ RULES_COLUMN_END_HOUR + " INTEGER NOT NULL, " + RULES_COLUMN_END_MINUTE + " INTEGER NOT NULL, " + RULES_COLUMN_LEVEL + " TEXT NOT NULL);";
-	private static final String RULES_INDEX_NAME_CREATE = "CREATE UNIQUE INDEX " + RULES_TABLE_NAME + "_" + RULES_COLUMN_NAME + " ON " + RULES_TABLE_NAME
-			+ " (" + RULES_COLUMN_NAME + ");";
+	private static final String RULES_INDEX_NAME_CREATE = "CREATE UNIQUE INDEX " + RULES_TABLE_NAME + "_" + RULES_COLUMN_NAME + " ON " + RULES_TABLE_NAME + " ("
+			+ RULES_COLUMN_NAME + ");";
 
 	private Context context;
 
@@ -142,7 +142,7 @@ public class RulesDAO extends SQLiteOpenHelper {
 	}
 
 	public boolean addRule(Rule rule) {
-		log.info("Add {}", rule);
+		log.debug("Add {}", rule);
 		Preconditions.checkArgument(rule.getId() == 0, "Rule id != 0");
 
 		long id;
@@ -171,7 +171,7 @@ public class RulesDAO extends SQLiteOpenHelper {
 	}
 
 	private boolean updateRule(Rule rule, Set<String> columns) {
-		log.info("Update {}", rule);
+		log.debug("Update {}", rule);
 
 		int rows;
 		ContentValues values = toContentValues(rule, columns);
@@ -196,42 +196,42 @@ public class RulesDAO extends SQLiteOpenHelper {
 
 	public boolean updateRuleEnabled(Rule rule) {
 		rule.setTemporarilyDisabled(false);
-		log.info("Update rule enabled {}", rule);
+		log.debug("Update rule enabled {}", rule);
 		return updateRule(rule, ImmutableSet.of(RULES_COLUMN_ENABLED, RULES_COLUMN_TEMPORARILY_DISABLED));
 	}
 
 	public boolean updateRuleTemporarilyDisabled(Rule rule) {
-		log.info("Update rule temporarily disabled {}", rule);
+		log.debug("Update rule temporarily disabled {}", rule);
 		return updateRule(rule, ImmutableSet.of(RULES_COLUMN_TEMPORARILY_DISABLED));
 	}
 
 	public boolean updateRuleName(Rule rule) {
-		log.info("Update rule name {}", rule);
+		log.debug("Update rule name {}", rule);
 		return updateRule(rule, ImmutableSet.of(RULES_COLUMN_NAME));
 	}
 
 	public boolean updateRuleDays(Rule rule) {
-		log.info("Update rule days {}", rule);
+		log.debug("Update rule days {}", rule);
 		return updateRule(rule, ImmutableSet.of(RULES_COLUMN_DAYS));
 	}
 
 	public boolean updateRuleStartTime(Rule rule) {
-		log.info("Update rule start time {}", rule);
+		log.debug("Update rule start time {}", rule);
 		return updateRule(rule, ImmutableSet.of(RULES_COLUMN_START_HOUR, RULES_COLUMN_START_MINUTE));
 	}
 
 	public boolean updateRuleEndTime(Rule rule) {
-		log.info("Update rule end time {}", rule);
+		log.debug("Update rule end time {}", rule);
 		return updateRule(rule, ImmutableSet.of(RULES_COLUMN_END_HOUR, RULES_COLUMN_END_MINUTE));
 	}
 
 	public boolean updateRuleLevel(Rule rule) {
-		log.info("Update rule level {}", rule);
+		log.debug("Update rule level {}", rule);
 		return updateRule(rule, ImmutableSet.of(RULES_COLUMN_LEVEL));
 	}
 
 	public boolean deleteRule(Rule rule) {
-		log.info("Delete {}", rule);
+		log.debug("Delete {}", rule);
 
 		int rows;
 		SQLiteDatabase db = getWritableDatabase();
@@ -283,7 +283,7 @@ public class RulesDAO extends SQLiteOpenHelper {
 			db.endTransaction();
 		}
 
-		log.info("Get rule: {}", rule);
+		log.debug("Get rule: {}", rule);
 		return rule;
 	}
 
@@ -303,7 +303,7 @@ public class RulesDAO extends SQLiteOpenHelper {
 			db.endTransaction();
 		}
 
-		log.info("Get rule: {}", rule);
+		log.debug("Get rule: {}", rule);
 		return rule;
 	}
 
@@ -323,7 +323,7 @@ public class RulesDAO extends SQLiteOpenHelper {
 			db.endTransaction();
 		}
 
-		log.info("Get rules: {}", rules.size());
+		log.debug("Get rules: {}", rules.size());
 		return rules;
 	}
 }
