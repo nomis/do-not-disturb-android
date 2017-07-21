@@ -27,9 +27,7 @@
 	<string name="end_time">End time</string>
 	<string name="level">Do not disturb"</string>
 
-	<string name="fmt_start_time">%1$02d:%2$02d</string>
-	<string name="fmt_end_time_same_day">%1$02d:%2$02d</string>
-	<string name="fmt_end_time_next_day">%1$02d:%2$02d next day</string>
+	<string name="fmt_next_day">%1$s next day</string>
 	<string name="fmt_day_range">%1$s - %2$s</string>
 	<string name="days_separator">", "</string>
 	<string name="all_days">Every day</string>

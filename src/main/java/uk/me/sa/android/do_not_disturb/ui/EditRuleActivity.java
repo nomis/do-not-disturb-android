@@ -38,9 +38,10 @@ import org.androidannotations.annotations.ViewById;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.me.sa.android.do_not_disturb.R;
-import uk.me.sa.android.do_not_disturb.data.Rule;
-import uk.me.sa.android.do_not_disturb.data.RulesDAO;
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.primitives.Booleans;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
@@ -50,14 +51,14 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.text.format.DateFormat;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
-import com.google.common.primitives.Booleans;
+import uk.me.sa.android.do_not_disturb.R;
+import uk.me.sa.android.do_not_disturb.data.Rule;
+import uk.me.sa.android.do_not_disturb.data.RulesDAO;
 
 @EActivity(R.layout.edit_rule)
 @OptionsMenu(R.menu.edit_rule_actions)
@@ -102,6 +103,12 @@ public class EditRuleActivity extends Activity {
 		setIntent(intent);
 	}
 
+	@Override
+	protected void onStart() {
+		super.onStart();
+		loadRule();
+	}
+
 	@AfterExtras
 	void onEdit() {
 		log.debug("Edit {}", id);
@@ -137,14 +144,16 @@ public class EditRuleActivity extends Activity {
 		log.debug("Show {}", rule);
 
 		if (rule != null) {
-			getActionBar().setTitle(rule.getName());
-			enabled.setText(getResources().getString(rule.isEnabled() ? R.string.on : R.string.off));
-			enabled.setChecked(rule.isEnabled());
-			name.setText(rule.getName());
-			days.setText(ruleText.getDays(rule));
-			start.setText(ruleText.getStartTime(rule));
-			end.setText(ruleText.getEndTime(rule));
-			level.setText(ruleText.getLevel(rule));
+			Rule show = rule.clone();
+
+			getActionBar().setTitle(show.getName());
+			enabled.setText(getResources().getString(show.isEnabled() ? R.string.on : R.string.off));
+			enabled.setChecked(show.isEnabled());
+			name.setText(show.getName());
+			days.setText(ruleText.getDays(show));
+			start.setText(ruleText.getStartTime(show));
+			end.setText(ruleText.getEndTime(show));
+			level.setText(ruleText.getLevel(show));
 		}
 	}
 
@@ -245,7 +254,7 @@ public class EditRuleActivity extends Activity {
 					}
 				}.execute();
 			}
-		}, edit.getStartHour(), edit.getStartMinute(), true).show();
+		}, edit.getStartHour(), edit.getStartMinute(), DateFormat.is24HourFormat(this)).show();
 	}
 
 	@Click(R.id.end_time_row)
@@ -265,7 +274,7 @@ public class EditRuleActivity extends Activity {
 					}
 				}.execute();
 			}
-		}, edit.getEndHour(), edit.getEndMinute(), true).show();
+		}, edit.getEndHour(), edit.getEndMinute(), DateFormat.is24HourFormat(this)).show();
 	}
 
 	void savedRule(boolean success) {

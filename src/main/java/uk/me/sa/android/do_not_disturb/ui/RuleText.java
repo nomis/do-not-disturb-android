@@ -29,12 +29,13 @@ import java.util.Set;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 
-import uk.me.sa.android.do_not_disturb.R;
-import uk.me.sa.android.do_not_disturb.data.Rule;
-import android.content.Context;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
+import android.content.Context;
+import android.text.format.DateFormat;
+import uk.me.sa.android.do_not_disturb.R;
+import uk.me.sa.android.do_not_disturb.data.Rule;
 
 @EBean
 public class RuleText {
@@ -169,12 +170,24 @@ public class RuleText {
 	}
 
 	public String getStartTime(Rule rule) {
-		return String.format(context.getResources().getString(R.string.fmt_start_time, rule.getStartHour(), rule.getStartMinute()));
+		Calendar c = GregorianCalendar.getInstance();
+		c.clear();
+		c.set(Calendar.HOUR_OF_DAY, rule.getStartHour());
+		c.set(Calendar.MINUTE, rule.getStartMinute());
+		return DateFormat.getTimeFormat(context).format(c.getTime());
 	}
 
 	public String getEndTime(Rule rule) {
-		return String.format(context.getResources().getString(rule.isEndNextDay() ? R.string.fmt_end_time_next_day : R.string.fmt_end_time_same_day,
-				rule.getEndHour(), rule.getEndMinute()));
+		Calendar c = GregorianCalendar.getInstance();
+		c.clear();
+		c.set(Calendar.HOUR_OF_DAY, rule.getEndHour());
+		c.set(Calendar.MINUTE, rule.getEndMinute());
+		String time = DateFormat.getTimeFormat(context).format(c.getTime());
+		if (rule.isEndNextDay()) {
+			return String.format(context.getResources().getString(R.string.fmt_next_day, time));
+		} else {
+			return time;
+		}
 	}
 
 	public String getLevel(Rule rule) {
@@ -183,8 +196,8 @@ public class RuleText {
 
 	public String getDescription(Rule rule) {
 		if (rule.isEnabled()) {
-			return String.format(context.getResources().getString(R.string.fmt_description, getDaysSummary(rule), getStartTime(rule), getEndTime(rule),
-					getLevel(rule)));
+			return String.format(
+					context.getResources().getString(R.string.fmt_description, getDaysSummary(rule), getStartTime(rule), getEndTime(rule), getLevel(rule)));
 		} else {
 			return context.getResources().getString(R.string.off);
 		}
