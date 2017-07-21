@@ -86,13 +86,22 @@ public class EditRuleActivity extends Activity {
 	TextView days;
 
 	@ViewById
-	TextView start;
+	TextView start_time;
 
 	@ViewById
-	TextView end;
+	View start_time_row;
+
+	@ViewById
+	TextView end_time;
+
+	@ViewById
+	View end_time_row;
 
 	@ViewById
 	TextView level;
+
+	@ViewById
+	View level_row;
 
 	@Bean
 	RulesDAO db;
@@ -156,9 +165,19 @@ public class EditRuleActivity extends Activity {
 			enabled.setChecked(show.isEnabled());
 			name.setText(show.getName());
 			days.setText(ruleText.getDays(show));
-			start.setText(ruleText.getStartTime(show));
-			end.setText(ruleText.getEndTime(show));
+			start_time.setText(ruleText.getStartTime(show));
+			end_time.setText(ruleText.getEndTime(show));
 			level.setText(ruleText.getLevel(show));
+
+			boolean hasDays = !show.getCalendarDays().isEmpty();
+
+			start_time_row.setAlpha(hasDays ? 1.0f : 0.50f);
+			end_time_row.setAlpha(hasDays ? 1.0f : 0.50f);
+			level_row.setAlpha(hasDays ? 1.0f : 0.50f);
+
+			start_time_row.setEnabled(hasDays);
+			end_time_row.setEnabled(hasDays);
+			level_row.setEnabled(hasDays);
 		}
 	}
 

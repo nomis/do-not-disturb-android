@@ -33,6 +33,7 @@
 		android:layout_width="wrap_content"
 		android:layout_height="match_parent"
 		android:gravity="center"
+		android:alpha="0.5"
 		android:src="@drawable/ic_access_time">
 	</ImageView>
 
@@ -49,7 +50,6 @@
 			android:layout_height="wrap_content"
 			android:textColor="?android:attr/textColorPrimary"
 			android:textSize="@dimen/keyTextSize"
-			android:textStyle="bold"
 			android:singleLine="true"
 			android:ellipsize="end">
 		</TextView>
@@ -58,7 +58,7 @@
 			android:id="@+id/description"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:textColor="?android:attr/textColorPrimary"
+			android:textColor="?android:attr/textColorSecondary"
 			android:textSize="@dimen/valueTextSize"
 			android:singleLine="true"
 			android:ellipsize="marquee">

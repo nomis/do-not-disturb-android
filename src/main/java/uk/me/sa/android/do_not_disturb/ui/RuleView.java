@@ -44,7 +44,6 @@ public class RuleView extends LinearLayout {
 	}
 
 	public void bind(Rule rule) {
-		// TODO adjust opacity and icon when disabled
 		name.setText(rule.getName());
 		description.setText(ruleText.getDescription(rule));
 	}
