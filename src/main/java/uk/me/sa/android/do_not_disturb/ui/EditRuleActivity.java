@@ -52,11 +52,16 @@ import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.text.format.DateFormat;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.PopupMenu;
+import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import uk.me.sa.android.do_not_disturb.R;
+import uk.me.sa.android.do_not_disturb.data.InterruptionFilter;
 import uk.me.sa.android.do_not_disturb.data.Rule;
 import uk.me.sa.android.do_not_disturb.data.RulesDAO;
 
@@ -275,6 +280,39 @@ public class EditRuleActivity extends Activity {
 				}.execute();
 			}
 		}, edit.getEndHour(), edit.getEndMinute(), DateFormat.is24HourFormat(this)).show();
+	}
+
+	@Click(R.id.level_row)
+	void editLevel(View view) {
+		PopupMenu menu = new PopupMenu(this, view);
+		menu.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				InterruptionFilter level = InterruptionFilter.UNKNOWN;
+
+				switch (item.getItemId()) {
+				case R.id.item_priority:
+					level = InterruptionFilter.PRIORITY;
+					break;
+				case R.id.item_alarms:
+					level = InterruptionFilter.ALARMS;
+					break;
+				case R.id.item_silent:
+					level = InterruptionFilter.SILENT;
+					break;
+				}
+
+				if (level != InterruptionFilter.UNKNOWN) {
+					Rule save = rule.clone();
+					save.setLevel(level);
+					savedRule(db.updateRuleLevel(save));
+				}
+
+				return true;
+			}
+		});
+		menu.inflate(R.menu.edit_rule_level);
+		menu.show();
 	}
 
 	void savedRule(boolean success) {
