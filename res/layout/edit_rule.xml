@@ -66,8 +66,7 @@
 				android:paddingBottom="@dimen/outerPadding"
 				android:paddingLeft="@dimen/outerPadding"
 				android:paddingRight="@dimen/outerPadding"
-				android:clickable="true"
-				android:focusable="true"
+				android:background="?android:attr/selectableItemBackground"
 				android:orientation="vertical">
 	
 				<TextView
@@ -95,8 +94,7 @@
 				android:paddingBottom="@dimen/outerPadding"
 				android:paddingLeft="@dimen/outerPadding"
 				android:paddingRight="@dimen/outerPadding"
-				android:clickable="true"
-				android:focusable="true"
+				android:background="?android:attr/selectableItemBackground"
 				android:orientation="vertical">
 	
 				<TextView
@@ -124,8 +122,7 @@
 				android:paddingBottom="@dimen/outerPadding"
 				android:paddingLeft="@dimen/outerPadding"
 				android:paddingRight="@dimen/outerPadding"
-				android:clickable="true"
-				android:focusable="true"
+				android:background="?android:attr/selectableItemBackground"
 				android:orientation="vertical">
 	
 				<TextView
@@ -153,8 +150,7 @@
 				android:paddingBottom="@dimen/outerPadding"
 				android:paddingLeft="@dimen/outerPadding"
 				android:paddingRight="@dimen/outerPadding"
-				android:clickable="true"
-				android:focusable="true"
+				android:background="?android:attr/selectableItemBackground"
 				android:orientation="vertical">
 	
 				<TextView
@@ -182,8 +178,7 @@
 				android:paddingBottom="@dimen/outerPadding"
 				android:paddingLeft="@dimen/outerPadding"
 				android:paddingRight="@dimen/outerPadding"
-				android:clickable="true"
-				android:focusable="true"
+				android:background="?android:attr/selectableItemBackground"
 				android:orientation="vertical">
 	
 				<TextView
