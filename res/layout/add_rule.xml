@@ -45,8 +45,6 @@
 		android:textColor="?android:attr/textColorPrimary"
 		android:textSize="18sp"
 		android:textStyle="bold"
-		android:text="@string/add_rule"
-		android:ellipsize="marquee"
-		android:singleLine="true">
+		android:text="@string/add_rule">
 	</TextView>
 </LinearLayout>

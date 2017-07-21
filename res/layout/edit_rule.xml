@@ -75,9 +75,7 @@
 					android:layout_height="wrap_content"
 					android:textColor="?android:attr/textColorPrimary"
 					android:textSize="@dimen/keyTextSize"
-					android:text="@string/rule_name"
-					android:singleLine="true"
-					android:ellipsize="end">
+					android:text="@string/rule_name">
 				</TextView>
 	
 				<TextView
@@ -85,8 +83,7 @@
 					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
 					android:textColor="?android:attr/textColorSecondary"
-					android:textSize="@dimen/valueTextSize"
-					android:singleLine="false">
+					android:textSize="@dimen/valueTextSize">
 				</TextView>
 			</LinearLayout>
 	
@@ -107,9 +104,7 @@
 					android:layout_height="wrap_content"
 					android:textColor="?android:attr/textColorPrimary"
 					android:textSize="@dimen/keyTextSize"
-					android:text="@string/days"
-					android:singleLine="true"
-					android:ellipsize="end">
+					android:text="@string/days">
 				</TextView>
 	
 				<TextView
@@ -117,9 +112,7 @@
 					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
 					android:textColor="?android:attr/textColorSecondary"
-					android:textSize="@dimen/valueTextSize"
-					android:singleLine="true"
-					android:ellipsize="marquee">
+					android:textSize="@dimen/valueTextSize">
 				</TextView>
 			</LinearLayout>
 	
@@ -140,9 +133,7 @@
 					android:layout_height="wrap_content"
 					android:textColor="?android:attr/textColorPrimary"
 					android:textSize="@dimen/keyTextSize"
-					android:text="@string/start_time"
-					android:singleLine="true"
-					android:ellipsize="end">
+					android:text="@string/start_time">
 				</TextView>
 	
 				<TextView
@@ -150,9 +141,7 @@
 					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
 					android:textColor="?android:attr/textColorSecondary"
-					android:textSize="@dimen/valueTextSize"
-					android:singleLine="true"
-					android:ellipsize="marquee">
+					android:textSize="@dimen/valueTextSize">
 				</TextView>
 			</LinearLayout>
 	
@@ -173,9 +162,7 @@
 					android:layout_height="wrap_content"
 					android:textColor="?android:attr/textColorPrimary"
 					android:textSize="@dimen/keyTextSize"
-					android:text="@string/end_time"
-					android:singleLine="true"
-					android:ellipsize="end">
+					android:text="@string/end_time">
 				</TextView>
 		
 				<TextView
@@ -183,9 +170,7 @@
 					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
 					android:textColor="?android:attr/textColorSecondary"
-					android:textSize="@dimen/valueTextSize"
-					android:singleLine="true"
-					android:ellipsize="marquee">
+					android:textSize="@dimen/valueTextSize">
 				</TextView>
 			</LinearLayout>
 	
@@ -206,9 +191,7 @@
 					android:layout_height="wrap_content"
 					android:textColor="?android:attr/textColorPrimary"
 					android:textSize="@dimen/keyTextSize"
-					android:text="@string/level"
-					android:singleLine="true"
-					android:ellipsize="end">
+					android:text="@string/level">
 				</TextView>
 	
 				<TextView
@@ -216,9 +199,7 @@
 					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
 					android:textColor="?android:attr/textColorSecondary"
-					android:textSize="@dimen/valueTextSize"
-					android:singleLine="true"
-					android:ellipsize="marquee">
+					android:textSize="@dimen/valueTextSize">
 				</TextView>
 			</LinearLayout>
 		</LinearLayout>
