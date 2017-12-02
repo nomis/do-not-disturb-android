@@ -20,9 +20,3 @@ script:
   - mvn test -B -V
 after_script:
   - "[ $TRAVIS_TEST_RESULT -ne 0 ] && head -n 500 target/surefire-reports/*.txt"
-notifications:
-  irc:
-    channels:
-    - "irc.imaginarynet.uk#ci"
-    skip_join: true
-
